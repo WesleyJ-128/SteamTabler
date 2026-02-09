@@ -123,7 +123,27 @@ def find_value_T_P(T: float, P: float, search_for: Property, T_P_table: list[dic
             return None, None, None, None, None
     
     # At this point we have a guarantee that neither temperature nor pressure exactly matches the table
-    
+    low_T = -inf
+    low_P = -inf
+    high_T = inf
+    high_P = inf
+    result_t_p = None
+    result_T_p = None
+    result_t_P = None
+    result_T_P = None
+    for x in T_P_table:
+        current_T = x[Property.TEMP.value]
+        current_P = x[Property.PRESSURE.value]
+        
+        if current_T > low_T and current_T < T:
+            low_T = current_T
+        elif current_T < high_T and current_T > T:
+            high_T = current_T
+
+        if current_P > low_P and current_P < P:
+            low_P = current_P
+        elif current_P < high_P and current_P > P:
+            high_P = current_P
 
 sat_by_T = read_csv(sat_by_T_file)
 sat_by_P = read_csv(sat_by_P_file)
