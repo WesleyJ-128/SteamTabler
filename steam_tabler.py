@@ -136,9 +136,15 @@ def find_value_T_P(T: float, P: float, search_for: Property, T_P_table: list[dic
         last_temp = temp
     if not low_temp:
         return None, None, None, None, None
+    
     low_temp_entries = [x for x in T_P_table if x[Property.TEMP.value] == low_temp]
     high_temp_entries = [x for x in T_P_table if x[Property.TEMP.value] == high_temp]
-    # now scan for pressure on either side from both lists
+    low_temp_result = search_interpolate(Property.PRESSURE, P, search_for, low_temp_entries)
+    high_temp_result = search_interpolate(Property.PRESSURE, P, search_for, high_temp_entries)
+    print(high_temp_result)
+    if low_temp_result[2] is None or high_temp_result[2] is None:
+        return None, None, None, None, None
+    return low_temp, high_temp, low_temp_result[0], low_temp_result[1], lin_interpolate(T, low_temp, high_temp, low_temp_result[2], high_temp_result[2])
     
     
 
@@ -148,4 +154,4 @@ sat_by_P = read_csv(sat_by_P_file)
 comp_sup = read_csv(comp_sup_file)
 
 #print(find_value_1var(Property.PRESSURE, 214, Property.ENTHALPY_VAPOR, sat_by_P, sat_by_T))
-print(find_value_T_P(23, 0.01, Property.ENTHALPY, comp_sup))
+print(find_value_T_P(23, 0.015, Property.ENTHALPY, comp_sup))
