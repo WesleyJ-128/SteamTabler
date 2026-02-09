@@ -1,7 +1,6 @@
 from csv import DictReader
 import os
 from enum import Enum
-import re
 from math import inf
 
 # this doesn't work if the working directory has been changed
