@@ -12,31 +12,44 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 sat_by_P_file = os.path.join(dir_path, "saturated_by_pressure_V1.4.csv")
 sat_by_T_file = os.path.join(dir_path, "saturated_by_temperature_V1.5.csv")
 comp_sup_file = os.path.join(dir_path, "compressed_liquid_and_superheated_steam_V1.3.csv")
+
+class PropType(Enum):
+    SAT = "sat"
+    P_T = "p_t"
+    SEARCH = "search"
 class Property(Enum):
-    TEMP = 'T (°C)'
-    PRESSURE = 'P (MPa)'
+    TEMP = 'T (°C)', "T", "Temperature", PropType.SEARCH
+    PRESSURE = 'P (MPa)', "P", "Pressure", PropType.SEARCH
 
-    VOLUME_LIQUID = 'Specific Volume Liquid (m^3/kg)'
-    VOLUME_VAPOR = 'Specific Volume Vapor (m^3/kg)'
-    VOLUME = 'Specific Volume (m^3/kg)'
-    DENSITY = 'Density (kg/m^3)'
+    VOLUME_LIQUID = 'Specific Volume Liquid (m^3/kg)', "liquid_V", "Specific Volume (liquid)", PropType.SAT
+    VOLUME_VAPOR = 'Specific Volume Vapor (m^3/kg)', "vapor_V", "Specific Volume (vapor)", PropType.SAT
+    VOLUME = 'Specific Volume (m^3/kg)', "V", "Specific Volume", PropType.P_T
+    DENSITY = 'Density (kg/m^3)', "rho", "Density", PropType.P_T
 
-    ENERGY_LIQUID = 'Internal Energy Liquid (kJ/kg)'
-    ENERGY_VAPOR = 'Internal Energy Vapor (kJ/kg)'
-    ENERGY_VAPORIZATION = 'Internal Energy of Vaporization (kJ/kg)'
-    ENERGY = 'Specific Internal Energy (kJ/kg)'
+    ENERGY_LIQUID = 'Internal Energy Liquid (kJ/kg)', "liquid_U", "Internal Energy (liquid)", PropType.SAT
+    ENERGY_VAPOR = 'Internal Energy Vapor (kJ/kg)', "vapor_U", "Internal Energy (vapor)", PropType.SAT
+    ENERGY_VAPORIZATION = 'Internal Energy of Vaporization (kJ/kg)', "vaporize_U", "Internal Energy of Vaporization", PropType.SAT
+    ENERGY = 'Specific Internal Energy (kJ/kg)', "U", "Internal Energy", PropType.P_T
 
-    ENTHALPY_LIQUID = 'Enthalpy Liquid (kJ/kg)'
-    ENTHALPY_VAPOR = 'Enthalpy Vapor (kJ/kg)'
-    ENTHALPY_VAPORIZATION = 'Enthalpy of Vaporization (kJ/kg)'
-    ENTHALPY = 'Specific Enthalpy (kJ/kg)'
+    ENTHALPY_LIQUID = 'Enthalpy Liquid (kJ/kg)', "liquid_H", "Enthalpy (liquid)", PropType.SAT
+    ENTHALPY_VAPOR = 'Enthalpy Vapor (kJ/kg)', "vapor_H", "Enthalpy (vapor)", PropType.SAT
+    ENTHALPY_VAPORIZATION = 'Enthalpy of Vaporization (kJ/kg)', "vaporize_H", "Enthalpy of Vaporization", PropType.SAT
+    ENTHALPY = 'Specific Enthalpy (kJ/kg)', "H", "Enthalpy", PropType.P_T
 
-    ENTROPY_LIQUID = 'Entropy Liquid [kJ/(kg K)]'
-    ENTROPY_VAPOR = 'Entropy Vapor [kJ/(kg K)]'
-    ENTROPY_VAPORIZATION = 'Entropy of Vaporization [kJ/(kg K)]'
-    ENTROPY = 'Specific Entropy [kJ/(kg K)]'
+    ENTROPY_LIQUID = 'Entropy Liquid [kJ/(kg K)]', "liquid_S", "Entropy (liquid)", PropType.SAT
+    ENTROPY_VAPOR = 'Entropy Vapor [kJ/(kg K)]', "vapor_S", "Entropy (vapor)", PropType.SAT
+    ENTROPY_VAPORIZATION = 'Entropy of Vaporization [kJ/(kg K)]', "vaporize_S", "Entropy of Vaporization", PropType.SAT
+    ENTROPY = 'Specific Entropy [kJ/(kg K)]', "S", "Entropy", PropType.P_T
 
-    PHASE = 'Phase'
+    PHASE = 'Phase', "phase", "Phase", PropType.P_T
+
+    def __new__(cls, table_name, internal_name, disp_name, type):
+        obj = object.__new__(cls)
+        obj._value_ = table_name
+        obj.internal_name = internal_name
+        obj.disp_name = disp_name
+        obj.type = type
+        return obj
 
 class Phase(Enum):
     VAPOR = 'vapor'
@@ -179,6 +192,8 @@ pres_units = ["MPa", "kPa", "Pa", "bar", "atm"]
 root = tk.Tk()
 root.title("SteamTabler")
 search_mode = tk.IntVar()
+input_temp = tk.DoubleVar()
+input_pres = tk.DoubleVar()
 
 tk.Label(root, text="Look up by:").grid(row=0,column=0,sticky='W')
 tk.Radiobutton(root, text="Saturation Temperature", variable=search_mode, value=SearchMode.SAT_BY_T.value).grid(row=1,column=0,sticky='W')
