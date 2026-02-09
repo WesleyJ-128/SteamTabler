@@ -3,6 +3,7 @@ import os
 from enum import Enum
 from math import inf
 import tkinter as tk
+from tkinter import ttk
 
 # this doesn't work if the working directory has been changed
 # so it's at the beginning just in case
@@ -171,6 +172,10 @@ sat_by_T = read_csv(sat_by_T_file)
 sat_by_P = read_csv(sat_by_P_file)
 comp_sup = read_csv(comp_sup_file)
 
+
+temp_units = ["°C", "K", "°F", "°R"]
+pres_units = ["MPa", "kPa", "Pa", "bar", "atm"]
+
 root = tk.Tk()
 root.title("SteamTabler")
 search_mode = tk.IntVar()
@@ -179,6 +184,17 @@ tk.Label(root, text="Look up by:").grid(row=0,column=0,sticky='W')
 tk.Radiobutton(root, text="Saturation Temperature", variable=search_mode, value=SearchMode.SAT_BY_T.value).grid(row=1,column=0,sticky='W')
 tk.Radiobutton(root, text="Saturation Pressure", variable=search_mode, value=SearchMode.SAT_BY_P.value).grid(row=2,column=0,sticky='W')
 tk.Radiobutton(root, text="Temperature and Pressure", variable=search_mode, value=SearchMode.T_AND_P.value).grid(row=3,column=0,sticky='W')
+
+tk.Label(root, text="Temperature:").grid(row=5,column=0)
+tk.Entry(root).grid(row=5,column=1)
+ttk.Combobox(root, values=temp_units, state="readonly").grid(row=5,column=2)
+
+tk.Label(root, text="Pressure:").grid(row=6,column=0)
+tk.Entry(root).grid(row=6,column=1)
+ttk.Combobox(root, values=pres_units, state="readonly").grid(row=6,column=2)
+
+tk.Label(root, text="Property to look up:").grid(row=8,column=0)
+ttk.Combobox(root,state="readonly").grid(row=8,column=1) # need dynamic contents
 
 
 root.mainloop()
