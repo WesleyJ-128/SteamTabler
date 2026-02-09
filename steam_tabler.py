@@ -189,6 +189,11 @@ comp_sup = read_csv(comp_sup_file)
 temp_units = ["°C", "K", "°F", "°R"]
 pres_units = ["MPa", "kPa", "Pa", "bar", "atm"]
 
+def update_result_options(event):
+    mode = search_mode.get()
+    if mode == SearchMode.SAT_BY_P.value or mode == SearchMode.SAT_BY_T.value:
+        result_type['values'] = [x.disp_name for x in Property if x.type == PropType.SAT]
+
 root = tk.Tk()
 root.title("SteamTabler")
 search_mode = tk.IntVar()
@@ -209,7 +214,7 @@ tk.Entry(root).grid(row=6,column=1)
 ttk.Combobox(root, values=pres_units, state="readonly").grid(row=6,column=2)
 
 tk.Label(root, text="Property to look up:").grid(row=8,column=0)
-ttk.Combobox(root,state="readonly").grid(row=8,column=1) # need dynamic contents
+result_type = ttk.Combobox(root,state="readonly").grid(row=8,column=1) # need dynamic contents
 
 
 root.mainloop()
