@@ -85,15 +85,19 @@ def search_interpolate(search_by: Property, search_by_value: float, search_for: 
         elif current_x < high_x and current_x > search_by_value:
             high_x = current_x
             high_result = x[search_for.value]
+    if low_result == None or high_result == None:
+        return None, None, None
     return low_x, high_x, lin_interpolate(search_by_value, low_x, high_x, low_result, high_result)
 
 def find_value_1var(search_by: Property, search_by_value: float, search_for: Property, P_table: list[dict], T_table: list[dict]):
     match search_by:
         case Property.TEMP:
             return search_interpolate(search_by, search_by_value, search_for, T_table)
+        case Property.PRESSURE:
+            return search_interpolate(search_by, search_by_value, search_for, P_table)
 
 sat_by_T = read_csv(sat_by_T_file)
 sat_by_P = read_csv(sat_by_P_file)
 comp_sup = read_csv(comp_sup_file)
 
-print(find_value_1var(Property.TEMP, 210.45, Property.ENTHALPY_VAPOR, sat_by_P, sat_by_T))
+print(find_value_1var(Property.PRESSURE, 2.14, Property.ENTHALPY_VAPOR, sat_by_P, sat_by_T))
