@@ -95,9 +95,11 @@ def find_value_1var(search_by: Property, search_by_value: float, search_for: Pro
             return search_interpolate(search_by, search_by_value, search_for, T_table)
         case Property.PRESSURE:
             return search_interpolate(search_by, search_by_value, search_for, P_table)
+        case _:
+            raise ValueError(f"Searching by {search_by.value} not supported!")
 
 sat_by_T = read_csv(sat_by_T_file)
 sat_by_P = read_csv(sat_by_P_file)
 comp_sup = read_csv(comp_sup_file)
 
-print(find_value_1var(Property.PRESSURE, 2.14, Property.ENTHALPY_VAPOR, sat_by_P, sat_by_T))
+print(find_value_1var(Property.ENERGY, 2.14, Property.ENTHALPY_VAPOR, sat_by_P, sat_by_T))
