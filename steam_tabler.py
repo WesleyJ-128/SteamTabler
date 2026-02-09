@@ -36,6 +36,13 @@ class Property(Enum):
 
     PHASE = 'Phase'
 
+class Phase(Enum):
+    VAPOR = 'vapor'
+    SATURATED_VAPOR = 'saturated vapor'
+    LIQUID = 'liquid'
+    SATURATED_LIQUID = 'saturated liquid'
+    SUPERCRITICAL_FLUID = 'supercritical fluid'
+
 def read_csv(filepath):
     title_block_num_lines = 6
     # load CSV data into lists of dictionaries
@@ -69,14 +76,3 @@ sat_by_T = read_csv(sat_by_T_file)
 sat_by_P = read_csv(sat_by_P_file)
 comp_sup = read_csv(comp_sup_file)
 
-#print(set([x[Property.PHASE.value] for x in comp_sup]))
-lines = []
-with open(comp_sup_file,"r",encoding="utf-8-sig") as f:
-    lines = f.readlines()
-for i in range(len(lines)):
-    if i < 7:
-        continue
-    space = re.compile(", ")
-    lines[i]=",".join(re.split(space, lines[i]))
-with open(comp_sup_file, "w",encoding="utf-8-sig") as f:
-    f.writelines(lines)
