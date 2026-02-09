@@ -1,6 +1,7 @@
 from csv import DictReader
 import os
 from enum import Enum
+import re
 
 # this doesn't work if the working directory has been changed
 # so it's at the beginning just in case
@@ -61,6 +62,21 @@ def double_interpolate(x, y, x_min, x_max, y_min, y_max, z_x_y, z_X_y, z_x_Y, z_
     high_y_point = lin_interpolate(x, x_min, x_max, z_x_Y, z_X_Y)
     return lin_interpolate(y, y_min, y_max, low_y_point, high_y_point)
 
+def find_value(search_by: Property, search_by_value: float, search_for: Property):
+    return None
+
 sat_by_T = read_csv(sat_by_T_file)
 sat_by_P = read_csv(sat_by_P_file)
 comp_sup = read_csv(comp_sup_file)
+
+#print(set([x[Property.PHASE.value] for x in comp_sup]))
+lines = []
+with open(comp_sup_file,"r",encoding="utf-8-sig") as f:
+    lines = f.readlines()
+for i in range(len(lines)):
+    if i < 7:
+        continue
+    space = re.compile(", ")
+    lines[i]=",".join(re.split(space, lines[i]))
+with open(comp_sup_file, "w",encoding="utf-8-sig") as f:
+    f.writelines(lines)
