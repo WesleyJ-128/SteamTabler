@@ -9,24 +9,28 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 class Property(Enum):
     TEMP = 'T (°C)'
     PRESSURE = 'P (MPa)'
+
     VOLUME_LIQUID = 'Specific Volume Liquid (m^3/kg)'
     VOLUME_VAPOR = 'Specific Volume Vapor (m^3/kg)'
     VOLUME = 'Specific Volume (m^3/kg)'
     DENSITY = 'Density (kg/m^3)'
+
     ENERGY_LIQUID = 'Internal Energy Liquid (kJ/kg)'
     ENERGY_VAPOR = 'Internal Energy Vapor (kJ/kg)'
     ENERGY_VAPORIZATION = 'Internal Energy of Vaporization (kJ/kg)'
     ENERGY = 'Specific Internal Energy (kJ/kg)'
+
     ENTHALPY_LIQUID = 'Enthalpy Liquid (kJ/kg)'
     ENTHALPY_VAPOR = 'Enthalpy Vapor (kJ/kg)'
     ENTHALPY_VAPORIZATION = 'Enthalpy of Vaporization (kJ/kg)'
     ENTHALPY = 'Specific Enthalpy (kJ/kg)'
+
     ENTROPY_LIQUID = 'Entropy Liquid [kJ/(kg K)]'
     ENTROPY_VAPOR = 'Entropy Vapor [kJ/(kg K)]'
     ENTROPY_VAPORIZATION = 'Entropy of Vaporization [kJ/(kg K)]'
     ENTROPY = 'Specific Entropy [kJ/(kg K)]'
-    PHASE = 'Phase'
 
+    PHASE = 'Phase'
 
 def read_csv(filepath):
     title_block_num_lines = 6
@@ -63,5 +67,3 @@ comp_sup_file = os.path.join(dir_path, "compressed_liquid_and_superheated_steam_
 sat_by_T = convert_to_number(read_csv(sat_by_T_file))
 sat_by_P = convert_to_number(read_csv(sat_by_P_file))
 comp_sup = convert_to_number(read_csv(comp_sup_file))
-
-print([x for x in sat_by_P if x["P (MPa)"] == 1.3])
