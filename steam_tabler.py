@@ -123,27 +123,33 @@ def find_value_T_P(T: float, P: float, search_for: Property, T_P_table: list[dic
             return None, None, None, None, None
     
     # At this point we have a guarantee that neither temperature nor pressure exactly matches the table
-    low_T = -inf
-    low_P = -inf
-    high_T = inf
-    high_P = inf
-    result_t_p = None
-    result_T_p = None
-    result_t_P = None
-    result_T_P = None
-    for x in T_P_table:
-        current_T = x[Property.TEMP.value]
-        current_P = x[Property.PRESSURE.value]
-        
-        if current_T > low_T and current_T < T:
-            low_T = current_T
-        elif current_T < high_T and current_T > T:
-            high_T = current_T
+    # Get unique pressure and temperature values
+    unique_temps = sorted(list(set([x[Property.TEMP.value] for x in T_P_table])))
+    unique_press = sorted(list(set([x[Property.PRESSURE.value] for x in T_P_table])))
+    
+    last_temp = unique_temps[0]
+    low_temp = None
+    high_temp = None
+    for temp in unique_temps:
+        if temp > T and last_temp < T:
+            low_temp = last_temp
+            high_temp = temp
+        last_temp = temp
+    if not low_temp:
+        return None, None, None, None, None
+    
+    last_pres = unique_press[0]
+    low_pres = None
+    high_pres = None
+    for pres in unique_press:
+        if pres > P and last_pres < P:
+            low_pres = last_pres
+            high_pres = pres
+        last_pres = pres
+    if not low_pres:
+        return None, None, None, None, None
+    
 
-        if current_P > low_P and current_P < P:
-            low_P = current_P
-        elif current_P < high_P and current_P > P:
-            high_P = current_P
 
 sat_by_T = read_csv(sat_by_T_file)
 sat_by_P = read_csv(sat_by_P_file)
