@@ -98,8 +98,36 @@ def find_value_1var(search_by: Property, search_by_value: float, search_for: Pro
         case _:
             raise ValueError(f"Searching by {search_by.value} not supported!")
 
+def find_value_T_P(T: float, P: float, search_for: Property, T_P_table: list[dict]):
+    # Check if both T and P match exactly
+    for x in T_P_table:
+        if x[Property.TEMP.value] == T and x[Property.PRESSURE.value] == P:
+            return T, T, P, P, x[search_for.value]
+        
+    # Check if T matches exactly but P doesn't
+    matches_T = [x for x in T_P_table if x[Property.TEMP.value] == T]
+    if matches_T:
+        result = search_interpolate(Property.PRESSURE, P, search_for, matches_T)
+        if result[2]:
+            return (T, T) + result
+        else:
+            return None, None, None, None, None
+    
+    # Check if P matches exactly but T doesn't
+    matches_P = [x for x in T_P_table if x[Property.PRESSURE.value] == P]
+    if matches_P:
+        result = search_interpolate(Property.TEMP, T, search_for, matches_P)
+        if result[2]:
+            return result[:2] + (P, P) + result[2:]
+        else:
+            return None, None, None, None, None
+    
+    # At this point we have a guarantee that neither temperature nor pressure exactly matches the table
+    
+
 sat_by_T = read_csv(sat_by_T_file)
 sat_by_P = read_csv(sat_by_P_file)
 comp_sup = read_csv(comp_sup_file)
 
-print(find_value_1var(Property.ENERGY, 2.14, Property.ENTHALPY_VAPOR, sat_by_P, sat_by_T))
+#print(find_value_1var(Property.PRESSURE, 214, Property.ENTHALPY_VAPOR, sat_by_P, sat_by_T))
+print(find_value_T_P(23, 0.01, Property.ENTHALPY, comp_sup))
