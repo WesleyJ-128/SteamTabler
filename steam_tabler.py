@@ -2,6 +2,7 @@ from csv import DictReader
 import os
 from enum import Enum
 from math import inf
+import tkinter as tk
 
 # this doesn't work if the working directory has been changed
 # so it's at the beginning just in case
@@ -42,6 +43,11 @@ class Phase(Enum):
     LIQUID = 'liquid'
     SATURATED_LIQUID = 'saturated liquid'
     SUPERCRITICAL_FLUID = 'supercritical fluid'
+
+class SearchMode(Enum):
+    SAT_BY_T = 0
+    SAT_BY_P = 1
+    T_AND_P = 2
 
 def read_csv(filepath):
     title_block_num_lines = 6
@@ -161,12 +167,18 @@ def find_value_T_P(T: float, P: float, search_for: Property, T_P_table: list[dic
         result = lin_interpolate(T, low_temp, high_temp, low_temp_result[2], high_temp_result[2])
     return low_temp, high_temp, low_temp_result[0], low_temp_result[1], result
     
-    
-
-
 sat_by_T = read_csv(sat_by_T_file)
 sat_by_P = read_csv(sat_by_P_file)
 comp_sup = read_csv(comp_sup_file)
 
-#print(find_value_1var(Property.PRESSURE, 214, Property.ENTHALPY_VAPOR, sat_by_P, sat_by_T))
-print(find_value_T_P(99.606, 0.1, Property.PHASE, comp_sup))
+root = tk.Tk()
+root.title("SteamTabler")
+search_mode = tk.IntVar()
+
+tk.Label(root, text="Look up by:").grid(row=0,column=0,sticky='W')
+tk.Radiobutton(root, text="Saturation Temperature", variable=search_mode, value=SearchMode.SAT_BY_T.value).grid(row=1,column=0,sticky='W')
+tk.Radiobutton(root, text="Saturation Pressure", variable=search_mode, value=SearchMode.SAT_BY_P.value).grid(row=2,column=0,sticky='W')
+tk.Radiobutton(root, text="Temperature and Pressure", variable=search_mode, value=SearchMode.T_AND_P.value).grid(row=3,column=0,sticky='W')
+
+
+root.mainloop()
