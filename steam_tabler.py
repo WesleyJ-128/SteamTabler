@@ -87,7 +87,15 @@ def search_interpolate(search_by: Property, search_by_value: float, search_for: 
             high_result = x[search_for.value]
     if low_result == None or high_result == None:
         return None, None, None
-    return low_x, high_x, lin_interpolate(search_by_value, low_x, high_x, low_result, high_result)
+    # special case to deal with phase string values
+    if search_for == Property.PHASE:
+        if low_result == high_result:
+            result = low_result
+        else:
+            result = f"{low_result} or {high_result}"
+    else:
+        result = lin_interpolate(search_by_value, low_x, high_x, low_result, high_result)
+    return low_x, high_x, result
 
 def find_value_1var(search_by: Property, search_by_value: float, search_for: Property, P_table: list[dict], T_table: list[dict]):
     match search_by:
@@ -144,7 +152,15 @@ def find_value_T_P(T: float, P: float, search_for: Property, T_P_table: list[dic
     print(high_temp_result)
     if low_temp_result[2] is None or high_temp_result[2] is None:
         return None, None, None, None, None
-    return low_temp, high_temp, low_temp_result[0], low_temp_result[1], lin_interpolate(T, low_temp, high_temp, low_temp_result[2], high_temp_result[2])
+    # special case to deal with phase string values
+    if search_for == Property.PHASE:
+        if low_temp_result[2] == high_temp_result[2]:
+            result = low_temp_result[2]
+        else:
+            result = f"{low_temp_result[2]} or {high_temp_result[2]}"
+    else:
+        result = lin_interpolate(T, low_temp, high_temp, low_temp_result[2], high_temp_result[2])
+    return low_temp, high_temp, low_temp_result[0], low_temp_result[1], result
     
     
 
@@ -154,4 +170,4 @@ sat_by_P = read_csv(sat_by_P_file)
 comp_sup = read_csv(comp_sup_file)
 
 #print(find_value_1var(Property.PRESSURE, 214, Property.ENTHALPY_VAPOR, sat_by_P, sat_by_T))
-print(find_value_T_P(23, 0.015, Property.ENTHALPY, comp_sup))
+print(find_value_T_P(99.606, 0.1, Property.PHASE, comp_sup))
