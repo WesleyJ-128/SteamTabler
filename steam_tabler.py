@@ -2,6 +2,7 @@ from csv import DictReader
 import os
 from enum import Enum
 import re
+from math import inf
 
 # this doesn't work if the working directory has been changed
 # so it's at the beginning just in case
@@ -69,10 +70,30 @@ def double_interpolate(x, y, x_min, x_max, y_min, y_max, z_x_y, z_X_y, z_x_Y, z_
     high_y_point = lin_interpolate(x, x_min, x_max, z_x_Y, z_X_Y)
     return lin_interpolate(y, y_min, y_max, low_y_point, high_y_point)
 
-def find_value(search_by: Property, search_by_value: float, search_for: Property):
-    return None
+def search_interpolate(search_by: Property, search_by_value: float, search_for: Property, table: list[dict]):
+    low_x = -inf
+    high_x = inf
+    low_result = None
+    high_result = None
+    for x in table:
+        current_x = x[search_by.value]
+        if current_x == search_by_value:
+            return current_x, current_x, x[search_for.value]
+        elif current_x > low_x and current_x < search_by_value:
+            low_x = current_x
+            low_result = x[search_for.value]
+        elif current_x < high_x and current_x > search_by_value:
+            high_x = current_x
+            high_result = x[search_for.value]
+    return low_x, high_x, lin_interpolate(search_by_value, low_x, high_x, low_result, high_result)
+
+def find_value_1var(search_by: Property, search_by_value: float, search_for: Property, P_table: list[dict], T_table: list[dict]):
+    match search_by:
+        case Property.TEMP:
+            return search_interpolate(search_by, search_by_value, search_for, T_table)
 
 sat_by_T = read_csv(sat_by_T_file)
 sat_by_P = read_csv(sat_by_P_file)
 comp_sup = read_csv(comp_sup_file)
 
+print(find_value_1var(Property.TEMP, 210.45, Property.ENTHALPY_VAPOR, sat_by_P, sat_by_T))
