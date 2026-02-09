@@ -125,7 +125,6 @@ def find_value_T_P(T: float, P: float, search_for: Property, T_P_table: list[dic
     # At this point we have a guarantee that neither temperature nor pressure exactly matches the table
     # Get unique pressure and temperature values
     unique_temps = sorted(list(set([x[Property.TEMP.value] for x in T_P_table])))
-    unique_press = sorted(list(set([x[Property.PRESSURE.value] for x in T_P_table])))
     
     last_temp = unique_temps[0]
     low_temp = None
@@ -137,17 +136,10 @@ def find_value_T_P(T: float, P: float, search_for: Property, T_P_table: list[dic
         last_temp = temp
     if not low_temp:
         return None, None, None, None, None
+    low_temp_entries = [x for x in T_P_table if x[Property.TEMP.value] == low_temp]
+    high_temp_entries = [x for x in T_P_table if x[Property.TEMP.value] == high_temp]
+    # now scan for pressure on either side from both lists
     
-    last_pres = unique_press[0]
-    low_pres = None
-    high_pres = None
-    for pres in unique_press:
-        if pres > P and last_pres < P:
-            low_pres = last_pres
-            high_pres = pres
-        last_pres = pres
-    if not low_pres:
-        return None, None, None, None, None
     
 
 
