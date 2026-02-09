@@ -6,6 +6,9 @@ from enum import Enum
 # so it's at the beginning just in case
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
+sat_by_P_file = os.path.join(dir_path, "saturated_by_pressure_V1.4.csv")
+sat_by_T_file = os.path.join(dir_path, "saturated_by_temperature_V1.5.csv")
+comp_sup_file = os.path.join(dir_path, "compressed_liquid_and_superheated_steam_V1.3.csv")
 class Property(Enum):
     TEMP = 'T (°C)'
     PRESSURE = 'P (MPa)'
@@ -57,10 +60,6 @@ def double_interpolate(x, y, x_min, x_max, y_min, y_max, z_x_y, z_X_y, z_x_Y, z_
     low_y_point = lin_interpolate(x, x_min, x_max, z_x_y, z_X_y)
     high_y_point = lin_interpolate(x, x_min, x_max, z_x_Y, z_X_Y)
     return lin_interpolate(y, y_min, y_max, low_y_point, high_y_point)
-
-sat_by_P_file = os.path.join(dir_path, "saturated_by_pressure_V1.4.csv")
-sat_by_T_file = os.path.join(dir_path, "saturated_by_temperature_V1.5.csv")
-comp_sup_file = os.path.join(dir_path, "compressed_liquid_and_superheated_steam_V1.3.csv")
 
 sat_by_T = read_csv(sat_by_T_file)
 sat_by_P = read_csv(sat_by_P_file)
