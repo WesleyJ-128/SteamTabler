@@ -21,32 +21,32 @@ class Property(Enum):
     TEMP = 'T (°C)', "T", "Temperature", PropType.SEARCH
     PRESSURE = 'P (MPa)', "P", "Pressure", PropType.SEARCH
 
-    VOLUME_LIQUID = 'Specific Volume Liquid (m^3/kg)', "liquid_V", "Specific Volume (liquid)", PropType.SAT
-    VOLUME_VAPOR = 'Specific Volume Vapor (m^3/kg)', "vapor_V", "Specific Volume (vapor)", PropType.SAT
+    VOLUME_LIQUID = 'Specific Volume Liquid (m^3/kg)', "V", "Specific Volume (liquid)", PropType.SAT
+    VOLUME_VAPOR = 'Specific Volume Vapor (m^3/kg)', "V", "Specific Volume (vapor)", PropType.SAT
     VOLUME = 'Specific Volume (m^3/kg)', "V", "Specific Volume", PropType.P_T
     DENSITY = 'Density (kg/m^3)', "rho", "Density", PropType.P_T
 
-    ENERGY_LIQUID = 'Internal Energy Liquid (kJ/kg)', "liquid_U", "Internal Energy (liquid)", PropType.SAT
-    ENERGY_VAPOR = 'Internal Energy Vapor (kJ/kg)', "vapor_U", "Internal Energy (vapor)", PropType.SAT
-    ENERGY_VAPORIZATION = 'Internal Energy of Vaporization (kJ/kg)', "vaporize_U", "Internal Energy of Vaporization", PropType.SAT
+    ENERGY_LIQUID = 'Internal Energy Liquid (kJ/kg)', "U", "Internal Energy (liquid)", PropType.SAT
+    ENERGY_VAPOR = 'Internal Energy Vapor (kJ/kg)', "U", "Internal Energy (vapor)", PropType.SAT
+    ENERGY_VAPORIZATION = 'Internal Energy of Vaporization (kJ/kg)', "U", "Internal Energy of Vaporization", PropType.SAT
     ENERGY = 'Specific Internal Energy (kJ/kg)', "U", "Internal Energy", PropType.P_T
 
-    ENTHALPY_LIQUID = 'Enthalpy Liquid (kJ/kg)', "liquid_H", "Enthalpy (liquid)", PropType.SAT
-    ENTHALPY_VAPOR = 'Enthalpy Vapor (kJ/kg)', "vapor_H", "Enthalpy (vapor)", PropType.SAT
-    ENTHALPY_VAPORIZATION = 'Enthalpy of Vaporization (kJ/kg)', "vaporize_H", "Enthalpy of Vaporization", PropType.SAT
+    ENTHALPY_LIQUID = 'Enthalpy Liquid (kJ/kg)', "H", "Enthalpy (liquid)", PropType.SAT
+    ENTHALPY_VAPOR = 'Enthalpy Vapor (kJ/kg)', "H", "Enthalpy (vapor)", PropType.SAT
+    ENTHALPY_VAPORIZATION = 'Enthalpy of Vaporization (kJ/kg)', "H", "Enthalpy of Vaporization", PropType.SAT
     ENTHALPY = 'Specific Enthalpy (kJ/kg)', "H", "Enthalpy", PropType.P_T
 
-    ENTROPY_LIQUID = 'Entropy Liquid [kJ/(kg K)]', "liquid_S", "Entropy (liquid)", PropType.SAT
-    ENTROPY_VAPOR = 'Entropy Vapor [kJ/(kg K)]', "vapor_S", "Entropy (vapor)", PropType.SAT
-    ENTROPY_VAPORIZATION = 'Entropy of Vaporization [kJ/(kg K)]', "vaporize_S", "Entropy of Vaporization", PropType.SAT
+    ENTROPY_LIQUID = 'Entropy Liquid [kJ/(kg K)]', "S", "Entropy (liquid)", PropType.SAT
+    ENTROPY_VAPOR = 'Entropy Vapor [kJ/(kg K)]', "S", "Entropy (vapor)", PropType.SAT
+    ENTROPY_VAPORIZATION = 'Entropy of Vaporization [kJ/(kg K)]', "S", "Entropy of Vaporization", PropType.SAT
     ENTROPY = 'Specific Entropy [kJ/(kg K)]', "S", "Entropy", PropType.P_T
 
-    PHASE = 'Phase', "phase", "Phase", PropType.P_T
+    PHASE = 'Phase', None, "Phase", PropType.P_T
 
-    def __new__(cls, table_name, internal_name, disp_name, type):
+    def __new__(cls, table_name, unit_type, disp_name, type):
         obj = object.__new__(cls)
         obj._value_ = table_name
-        obj.internal_name = internal_name
+        obj.internal_name = unit_type
         obj.disp_name = disp_name
         obj.type = type
         return obj
