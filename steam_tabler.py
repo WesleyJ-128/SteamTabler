@@ -226,10 +226,23 @@ def run_search():
                 temp_raw = float(temp_entry.get())
             except ValueError:
                 result_string.set("ERROR: Temperature must be a number.")
+                return
+            
             unit_raw = temp_unit_sel.get()
+            if not unit_raw:
+                result_string.set("ERROR: Select a temperature unit.")
+                return
+            
             result_type_raw = result_type.get()
+            if not result_type_raw:
+                result_string.set("ERROR: Select a property to look up.")
+                return
             table_var = [x for x in Property if x.disp_name == result_type_raw][0]
+
             result_unit_raw = result_unit_sel.get()
+            #if not result_unit_raw:
+                #result_string.set("ERROR: Select an output unit.")
+                #return
 
             table_temp = convert_units(None, None, temp_raw) # make real units
             (temp_low, temp_high, output) = search_interpolate(
@@ -241,13 +254,16 @@ def run_search():
             true_out = convert_units(None, None, output)
             disp_temp_low = convert_units(None, None, temp_low)
             disp_temp_high = convert_units(None, None, temp_high)
+
             if temp_low:
                 if temp_low == temp_high:
                     result_string.set(f"{result_type_raw} at {temp_raw} {unit_raw} is {true_out} {result_unit_raw}.")
                 else:
                     result_string.set(
-                        f"Interpolating between {disp_temp_low} {unit_raw} and {disp_temp_high} {unit_raw}.\n{result_type_raw} at {temp_raw} {unit_raw} is {true_out} {result_unit_raw}."
+                        f"Interpolating between {disp_temp_low} {unit_raw} and {disp_temp_high} {unit_raw}. \
+                        \n{result_type_raw} at {temp_raw} {unit_raw} is {true_out} {result_unit_raw}."
                     )
+                    
         case SearchMode.SAT_BY_P.value:
             pres_entry.get()
             pres_unit_sel.get()
