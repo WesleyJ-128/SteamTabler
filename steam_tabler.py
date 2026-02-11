@@ -51,14 +51,12 @@ class Property(Enum):
         obj.disp_name = disp_name
         obj.type = type
         return obj
-
 class Phase(Enum):
     VAPOR = 'vapor'
     SATURATED_VAPOR = 'saturated vapor'
     LIQUID = 'liquid'
     SATURATED_LIQUID = 'saturated liquid'
     SUPERCRITICAL_FLUID = 'supercritical fluid'
-
 class SearchMode(Enum):
     SAT_BY_T = 0
     SAT_BY_P = 1
@@ -210,11 +208,9 @@ def search_mode_change():
 def update_units(event):
     print("update")
 
-def convert_units(unit_from, unit_to, value):
-    # very annoying unit logic goes here
-    return value
-
 def run_search():
+    nulTemp = Units.Unit(1, Units.Type.TEMPERATURE)
+    nulPres = Units.Unit(1, Units.Type.PRESSURE)
     mode = search_mode.get()
     match mode:
         case SearchMode.SAT_BY_T.value:
@@ -240,16 +236,16 @@ def run_search():
                 #result_string.set("ERROR: Select an output unit.")
                 #return
 
-            table_temp = convert_units(None, None, temp_raw) # make real units
+            table_temp = Units.convert(temp_raw, nulTemp, nulTemp) # make real units
             (temp_low, temp_high, output) = search_interpolate(
                 Property.TEMP,
                 table_temp,
                 table_var,
                 sat_by_T
             )
-            true_out = convert_units(None, None, output)
-            disp_temp_low = convert_units(None, None, temp_low)
-            disp_temp_high = convert_units(None, None, temp_high)
+            true_out = Units.convert(output, nulTemp, nulTemp)
+            disp_temp_low = Units.convert(temp_low, nulTemp, nulTemp)
+            disp_temp_high = Units.convert(temp_high, nulTemp, nulTemp)
 
             if temp_low:
                 if temp_low == temp_high:
@@ -285,16 +281,16 @@ def run_search():
                 #result_string.set("ERROR: Select an output unit.")
                 #return
 
-            table_pres = convert_units(None, None, pres_raw) # make real units
+            table_pres = Units.convert(pres_raw, nulPres, nulPres) # make real units
             (pres_low, pres_high, output) = search_interpolate(
                 Property.PRESSURE,
                 table_pres,
                 table_var,
                 sat_by_P
             )
-            true_out = convert_units(None, None, output)
-            disp_pres_low = convert_units(None, None, pres_low)
-            disp_pres_high = convert_units(None, None, pres_high)
+            true_out = Units.convert(output, nulPres, nulPres)
+            disp_pres_low = Units.convert(pres_low, nulPres, nulPres)
+            disp_pres_high = Units.convert(pres_high, nulPres, nulPres)
 
             if pres_low:
                 if pres_low == pres_high:
