@@ -37,10 +37,10 @@ class Property(Enum):
     ENTHALPY_VAPORIZATION = 'Enthalpy of Vaporization (kJ/kg)', Units.Type.SPECIFIC_ENERGY, "Enthalpy of Vaporization", PropType.SAT
     ENTHALPY = 'Specific Enthalpy (kJ/kg)', Units.Type.SPECIFIC_ENERGY, "Enthalpy", PropType.P_T
 
-    ENTROPY_LIQUID = 'Entropy Liquid [kJ/(kg K)]', Units.Type.ENTROPY, "Entropy (liquid)", PropType.SAT
-    ENTROPY_VAPOR = 'Entropy Vapor [kJ/(kg K)]', Units.Type.ENTROPY, "Entropy (vapor)", PropType.SAT
-    ENTROPY_VAPORIZATION = 'Entropy of Vaporization [kJ/(kg K)]', Units.Type.ENTROPY, "Entropy of Vaporization", PropType.SAT
-    ENTROPY = 'Specific Entropy [kJ/(kg K)]', Units.Type.ENTROPY, "Entropy", PropType.P_T
+    ENTROPY_LIQUID = 'Entropy Liquid [kJ/(kg K)]', Units.Type.SPECIFIC_ENTROPY, "Entropy (liquid)", PropType.SAT
+    ENTROPY_VAPOR = 'Entropy Vapor [kJ/(kg K)]', Units.Type.SPECIFIC_ENTROPY, "Entropy (vapor)", PropType.SAT
+    ENTROPY_VAPORIZATION = 'Entropy of Vaporization [kJ/(kg K)]', Units.Type.SPECIFIC_ENTROPY, "Entropy of Vaporization", PropType.SAT
+    ENTROPY = 'Specific Entropy [kJ/(kg K)]', Units.Type.SPECIFIC_ENTROPY, "Entropy", PropType.P_T
 
     PHASE = 'Phase', None, "Phase", PropType.P_T
 
@@ -182,7 +182,11 @@ ALL_UNITS = [
     Units.Unit("kPa", 1e3, Units.Type.PRESSURE),
     Units.Unit("Pa", 1, Units.Type.PRESSURE),
     Units.Unit("bar", 1e5, Units.Type.PRESSURE),
-    Units.Unit("atm", 101325, Units.Type.PRESSURE)
+    Units.Unit("atm", 101325, Units.Type.PRESSURE),
+    Units.Unit("m^3/kg", 1, Units.Type.SPECIFIC_VOLUME),
+    Units.Unit("kg/m^3", 1, Units.Type.DENSITY),
+    Units.Unit("kJ/kg", 1000, Units.Type.SPECIFIC_ENERGY),
+    Units.Unit("kJ/(kg*K)", 1000, Units.Type.SPECIFIC_ENTROPY)
 ]
 temp_unit_symbols = sorted([x.symbol for x in ALL_UNITS if x.type == Units.Type.TEMPERATURE], key=lambda x: x.strip("°"))
 pres_unit_symbols = sorted([x.symbol for x in ALL_UNITS if x.type == Units.Type.PRESSURE], key=lambda x: x.lower())
@@ -304,7 +308,6 @@ def run_search():
                 sat_by_P
             )
             
-
             if pres_low:
                 true_out = Units.convert(output, nulPres, nulPres)
                 disp_pres_low = Units.convert(pres_low, MPA, pres_unit)
