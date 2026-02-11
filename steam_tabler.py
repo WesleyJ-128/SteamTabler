@@ -189,10 +189,34 @@ comp_sup = read_csv(comp_sup_file)
 temp_units = ["°C", "K", "°F", "°R"]
 pres_units = ["MPa", "kPa", "Pa", "bar", "atm"]
 
-def update_result_options(event):
+def search_mode_change():
     mode = search_mode.get()
-    if mode == SearchMode.SAT_BY_P.value or mode == SearchMode.SAT_BY_T.value:
-        result_type['values'] = [x.disp_name for x in Property if x.type == PropType.SAT]
+    result_type.set("")
+    match mode:
+        case SearchMode.SAT_BY_T.value:
+            result_type['values'] = sorted([x.disp_name for x in Property if x.type == PropType.SAT] + [Property.PRESSURE.disp_name])
+            temp_label.configure(state=tk.NORMAL)
+            temp_entry.configure(state=tk.NORMAL)
+            temp_unit_sel.configure(state=tk.NORMAL)
+            pres_label.configure(state=tk.DISABLED)
+            pres_entry.configure(state=tk.DISABLED)
+            pres_unit_sel.configure(state=tk.DISABLED)
+        case SearchMode.SAT_BY_P.value:
+            result_type['values'] = sorted([x.disp_name for x in Property if x.type == PropType.SAT] + [Property.TEMP.disp_name])
+            temp_label.configure(state=tk.DISABLED)
+            temp_entry.configure(state=tk.DISABLED)
+            temp_unit_sel.configure(state=tk.DISABLED)
+            pres_label.configure(state=tk.NORMAL)
+            pres_entry.configure(state=tk.NORMAL)
+            pres_unit_sel.configure(state=tk.NORMAL)
+        case SearchMode.T_AND_P.value:
+            result_type['values'] = sorted([x.disp_name for x in Property if x.type == PropType.P_T])
+            temp_label.configure(state=tk.NORMAL)
+            temp_entry.configure(state=tk.NORMAL)
+            temp_unit_sel.configure(state=tk.NORMAL)
+            pres_label.configure(state=tk.NORMAL)
+            pres_entry.configure(state=tk.NORMAL)
+            pres_unit_sel.configure(state=tk.NORMAL)
 
 root = tk.Tk()
 root.title("SteamTabler")
@@ -201,20 +225,28 @@ input_temp = tk.DoubleVar()
 input_pres = tk.DoubleVar()
 
 tk.Label(root, text="Look up by:").grid(row=0,column=0,sticky='W')
-tk.Radiobutton(root, text="Saturation Temperature", variable=search_mode, value=SearchMode.SAT_BY_T.value).grid(row=1,column=0,sticky='W')
-tk.Radiobutton(root, text="Saturation Pressure", variable=search_mode, value=SearchMode.SAT_BY_P.value).grid(row=2,column=0,sticky='W')
-tk.Radiobutton(root, text="Temperature and Pressure", variable=search_mode, value=SearchMode.T_AND_P.value).grid(row=3,column=0,sticky='W')
+tk.Radiobutton(root, command=search_mode_change, text="Saturation Temperature", variable=search_mode, value=SearchMode.SAT_BY_T.value).grid(row=1,column=0,sticky='W')
+tk.Radiobutton(root, command=search_mode_change, text="Saturation Pressure", variable=search_mode, value=SearchMode.SAT_BY_P.value).grid(row=2,column=0,sticky='W')
+tk.Radiobutton(root, command=search_mode_change, text="Temperature and Pressure", variable=search_mode, value=SearchMode.T_AND_P.value).grid(row=3,column=0,sticky='W')
 
-tk.Label(root, text="Temperature:").grid(row=5,column=0)
-tk.Entry(root).grid(row=5,column=1)
-ttk.Combobox(root, values=temp_units, state="readonly").grid(row=5,column=2)
+temp_label = tk.Label(root, text="Temperature:")
+temp_label.grid(row=5,column=0)
+temp_entry = tk.Entry(root)
+temp_entry.grid(row=5,column=1)
+temp_unit_sel = ttk.Combobox(root, values=temp_units, state="readonly")
+temp_unit_sel.grid(row=5,column=2)
 
-tk.Label(root, text="Pressure:").grid(row=6,column=0)
-tk.Entry(root).grid(row=6,column=1)
-ttk.Combobox(root, values=pres_units, state="readonly").grid(row=6,column=2)
+pres_label = tk.Label(root, text="Pressure:")
+pres_label.grid(row=6,column=0)
+pres_entry = tk.Entry(root)
+pres_entry.grid(row=6,column=1)
+pres_unit_sel = ttk.Combobox(root, values=pres_units, state="readonly")
+pres_unit_sel.grid(row=6,column=2)
 
 tk.Label(root, text="Property to look up:").grid(row=8,column=0)
-result_type = ttk.Combobox(root,state="readonly").grid(row=8,column=1) # need dynamic contents
+result_type = ttk.Combobox(root,state="readonly")
+result_type.grid(row=8,column=1,columnspan=2,sticky='EW')
+search_mode_change()
 
 
 root.mainloop()
