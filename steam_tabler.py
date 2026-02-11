@@ -4,6 +4,7 @@ from enum import Enum
 from math import inf
 import tkinter as tk
 from tkinter import ttk
+import Unit
 
 # this doesn't work if the working directory has been changed
 # so it's at the beginning just in case
@@ -18,28 +19,28 @@ class PropType(Enum):
     P_T = "p_t"
     SEARCH = "search"
 class Property(Enum):
-    TEMP = 'T (°C)', "T", "Temperature", PropType.SEARCH
-    PRESSURE = 'P (MPa)', "P", "Pressure", PropType.SEARCH
+    TEMP = 'T (°C)', Unit.Type.TEMPERATURE, "Temperature", PropType.SEARCH
+    PRESSURE = 'P (MPa)', Unit.Type.PRESSURE, "Pressure", PropType.SEARCH
 
-    VOLUME_LIQUID = 'Specific Volume Liquid (m^3/kg)', "V", "Specific Volume (liquid)", PropType.SAT
-    VOLUME_VAPOR = 'Specific Volume Vapor (m^3/kg)', "V", "Specific Volume (vapor)", PropType.SAT
-    VOLUME = 'Specific Volume (m^3/kg)', "V", "Specific Volume", PropType.P_T
-    DENSITY = 'Density (kg/m^3)', "rho", "Density", PropType.P_T
+    VOLUME_LIQUID = 'Specific Volume Liquid (m^3/kg)', Unit.Type.SPECIFIC_VOLUME, "Specific Volume (liquid)", PropType.SAT
+    VOLUME_VAPOR = 'Specific Volume Vapor (m^3/kg)', Unit.Type.SPECIFIC_VOLUME, "Specific Volume (vapor)", PropType.SAT
+    VOLUME = 'Specific Volume (m^3/kg)', Unit.Type.SPECIFIC_VOLUME, "Specific Volume", PropType.P_T
+    DENSITY = 'Density (kg/m^3)', Unit.Type.DENSITY, "Density", PropType.P_T
 
-    ENERGY_LIQUID = 'Internal Energy Liquid (kJ/kg)', "U", "Internal Energy (liquid)", PropType.SAT
-    ENERGY_VAPOR = 'Internal Energy Vapor (kJ/kg)', "U", "Internal Energy (vapor)", PropType.SAT
-    ENERGY_VAPORIZATION = 'Internal Energy of Vaporization (kJ/kg)', "U", "Internal Energy of Vaporization", PropType.SAT
-    ENERGY = 'Specific Internal Energy (kJ/kg)', "U", "Internal Energy", PropType.P_T
+    ENERGY_LIQUID = 'Internal Energy Liquid (kJ/kg)', Unit.Type.SPECIFIC_ENERGY, "Internal Energy (liquid)", PropType.SAT
+    ENERGY_VAPOR = 'Internal Energy Vapor (kJ/kg)', Unit.Type.SPECIFIC_ENERGY, "Internal Energy (vapor)", PropType.SAT
+    ENERGY_VAPORIZATION = 'Internal Energy of Vaporization (kJ/kg)', Unit.Type.SPECIFIC_ENERGY, "Internal Energy of Vaporization", PropType.SAT
+    ENERGY = 'Specific Internal Energy (kJ/kg)', Unit.Type.SPECIFIC_ENERGY, "Internal Energy", PropType.P_T
 
-    ENTHALPY_LIQUID = 'Enthalpy Liquid (kJ/kg)', "H", "Enthalpy (liquid)", PropType.SAT
-    ENTHALPY_VAPOR = 'Enthalpy Vapor (kJ/kg)', "H", "Enthalpy (vapor)", PropType.SAT
-    ENTHALPY_VAPORIZATION = 'Enthalpy of Vaporization (kJ/kg)', "H", "Enthalpy of Vaporization", PropType.SAT
-    ENTHALPY = 'Specific Enthalpy (kJ/kg)', "H", "Enthalpy", PropType.P_T
+    ENTHALPY_LIQUID = 'Enthalpy Liquid (kJ/kg)', Unit.Type.SPECIFIC_ENERGY, "Enthalpy (liquid)", PropType.SAT
+    ENTHALPY_VAPOR = 'Enthalpy Vapor (kJ/kg)', Unit.Type.SPECIFIC_ENERGY, "Enthalpy (vapor)", PropType.SAT
+    ENTHALPY_VAPORIZATION = 'Enthalpy of Vaporization (kJ/kg)', Unit.Type.SPECIFIC_ENERGY, "Enthalpy of Vaporization", PropType.SAT
+    ENTHALPY = 'Specific Enthalpy (kJ/kg)', Unit.Type.SPECIFIC_ENERGY, "Enthalpy", PropType.P_T
 
-    ENTROPY_LIQUID = 'Entropy Liquid [kJ/(kg K)]', "S", "Entropy (liquid)", PropType.SAT
-    ENTROPY_VAPOR = 'Entropy Vapor [kJ/(kg K)]', "S", "Entropy (vapor)", PropType.SAT
-    ENTROPY_VAPORIZATION = 'Entropy of Vaporization [kJ/(kg K)]', "S", "Entropy of Vaporization", PropType.SAT
-    ENTROPY = 'Specific Entropy [kJ/(kg K)]', "S", "Entropy", PropType.P_T
+    ENTROPY_LIQUID = 'Entropy Liquid [kJ/(kg K)]', Unit.Type.ENTROPY, "Entropy (liquid)", PropType.SAT
+    ENTROPY_VAPOR = 'Entropy Vapor [kJ/(kg K)]', Unit.Type.ENTROPY, "Entropy (vapor)", PropType.SAT
+    ENTROPY_VAPORIZATION = 'Entropy of Vaporization [kJ/(kg K)]', Unit.Type.ENTROPY, "Entropy of Vaporization", PropType.SAT
+    ENTROPY = 'Specific Entropy [kJ/(kg K)]', Unit.Type.ENTROPY, "Entropy", PropType.P_T
 
     PHASE = 'Phase', None, "Phase", PropType.P_T
 
