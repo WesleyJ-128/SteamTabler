@@ -171,22 +171,21 @@ sat_by_P = read_csv(sat_by_P_file)
 comp_sup = read_csv(comp_sup_file)
 
 
-temp_units = [
+CELSIUS = Units.Unit("°C", 1, Units.Type.TEMPERATURE, 273.15)
+MPA = Units.Unit("MPa", 1e6, Units.Type.PRESSURE)
+ALL_UNITS = [
     Units.Unit("K", 1, Units.Type.TEMPERATURE),
-    Units.Unit("°C", 1, Units.Type.TEMPERATURE, 273.15),
+    CELSIUS,
     Units.Unit("°F", 5/9, Units.Type.TEMPERATURE, -32, 273.15),
-    Units.Unit("°R", 5/9, Units.Type.TEMPERATURE)
-]
-temp_unit_symbols = sorted([x.symbol for x in temp_units], key=lambda x: x.strip("°"))
-
-pres_units = [
-    Units.Unit("MPa", 1e6, Units.Type.PRESSURE),
+    Units.Unit("°R", 5/9, Units.Type.TEMPERATURE),
+    MPA,
     Units.Unit("kPa", 1e3, Units.Type.PRESSURE),
     Units.Unit("Pa", 1, Units.Type.PRESSURE),
     Units.Unit("bar", 1e5, Units.Type.PRESSURE),
     Units.Unit("atm", 101325, Units.Type.PRESSURE)
 ]
-pres_unit_symbols = sorted([x.symbol for x in pres_units], key=lambda x: x.lower())
+temp_unit_symbols = sorted([x.symbol for x in ALL_UNITS if x.type == Units.Type.TEMPERATURE], key=lambda x: x.strip("°"))
+pres_unit_symbols = sorted([x.symbol for x in ALL_UNITS if x.type == Units.Type.PRESSURE], key=lambda x: x.lower())
 
 def search_mode_change():
     mode = search_mode.get()
@@ -238,7 +237,8 @@ def run_search():
             if not unit_raw:
                 result_string.set("ERROR: Select a temperature unit.")
                 return
-            
+            temp_unit = [x for x in ALL_UNITS if x.symbol == unit_raw][0]
+
             result_type_raw = result_type.get()
             if not result_type_raw:
                 result_string.set("ERROR: Select a property to look up.")
@@ -250,18 +250,18 @@ def run_search():
                 #result_string.set("ERROR: Select an output unit.")
                 #return
 
-            table_temp = Units.convert(temp_raw, nulTemp, nulTemp) # make real units
+            table_temp = Units.convert(temp_raw, temp_unit, CELSIUS)
             (temp_low, temp_high, output) = search_interpolate(
                 Property.TEMP,
                 table_temp,
                 table_var,
                 sat_by_T
             )
-            true_out = Units.convert(output, nulTemp, nulTemp)
-            disp_temp_low = Units.convert(temp_low, nulTemp, nulTemp)
-            disp_temp_high = Units.convert(temp_high, nulTemp, nulTemp)
 
             if temp_low:
+                true_out = Units.convert(output, nulTemp, nulTemp)
+                disp_temp_low = Units.convert(temp_low, CELSIUS, temp_unit)
+                disp_temp_high = Units.convert(temp_high, CELSIUS, temp_unit)
                 if temp_low == temp_high:
                     result_string.set(f"{result_type_raw} at {temp_raw} {unit_raw} is {true_out} {result_unit_raw}.")
                 else:
@@ -283,6 +283,7 @@ def run_search():
             if not unit_raw:
                 result_string.set("ERROR: Select a pressure unit.")
                 return
+            pres_unit = [x for x in ALL_UNITS if x.symbol == unit_raw][0]
             
             result_type_raw = result_type.get()
             if not result_type_raw:
@@ -295,18 +296,19 @@ def run_search():
                 #result_string.set("ERROR: Select an output unit.")
                 #return
 
-            table_pres = Units.convert(pres_raw, nulPres, nulPres) # make real units
+            table_pres = Units.convert(pres_raw, pres_unit, MPA)
             (pres_low, pres_high, output) = search_interpolate(
                 Property.PRESSURE,
                 table_pres,
                 table_var,
                 sat_by_P
             )
-            true_out = Units.convert(output, nulPres, nulPres)
-            disp_pres_low = Units.convert(pres_low, nulPres, nulPres)
-            disp_pres_high = Units.convert(pres_high, nulPres, nulPres)
+            
 
             if pres_low:
+                true_out = Units.convert(output, nulPres, nulPres)
+                disp_pres_low = Units.convert(pres_low, MPA, pres_unit)
+                disp_pres_high = Units.convert(pres_high, MPA, pres_unit)
                 if pres_low == pres_high:
                     result_string.set(f"{result_type_raw} at {pres_raw} {unit_raw} is {true_out} {result_unit_raw}.")
                 else:
@@ -367,4 +369,5 @@ result_string.set("No search results yet.")
 result.grid(row=11, column=0, columnspan=3)
 
 search_mode_change()
+print([x.si_shift for x in ALL_UNITS if x.symbol == "K"])
 root.mainloop()
