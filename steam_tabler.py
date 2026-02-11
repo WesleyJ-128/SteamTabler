@@ -47,7 +47,7 @@ class Property(Enum):
     def __new__(cls, table_name, unit_type, disp_name, type):
         obj = object.__new__(cls)
         obj._value_ = table_name
-        obj.internal_name = unit_type
+        obj.unit_type = unit_type
         obj.disp_name = disp_name
         obj.type = type
         return obj
@@ -223,7 +223,12 @@ def search_mode_change():
             pres_unit_sel.configure(state=tk.NORMAL)
 
 def update_units(event):
-    print("update")
+    current_result_type = result_type.get()
+    new_type = [x.unit_type for x in Property if x.disp_name == current_result_type][0]
+    new_units = sorted([x.symbol for x in ALL_UNITS if x.type == new_type], key=lambda x: x.strip("°").lower())
+    result_unit_sel["values"] = new_units
+    if len(new_units) == 1:
+        result_unit_sel.set(new_units[0])
 
 def run_search():
     nulTemp = Units.Unit("null", 1, Units.Type.TEMPERATURE)
