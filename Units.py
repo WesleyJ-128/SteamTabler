@@ -40,11 +40,7 @@ def convert(value: float, unit_from: Unit, unit_to: Unit) -> float:
     :return: ``value``, in terms of ``unit_to``
     :rtype: float
     """
+    if unit_from.type != unit_to.type:
+        raise ValueError("Cannot convert between units of mismatched type!")
     si_value = ((value + unit_from.native_shift) * unit_from.conversion) + unit_from.si_shift
     return ((si_value - unit_to.si_shift) / unit_to.conversion) - unit_to.native_shift
-
-if __name__ == "__main__":
-    kelvin = Unit(1, Type.TEMPERATURE)
-    farenheit = Unit(5/9, Type.TEMPERATURE, -32, 273.15)
-    while True:
-        print(convert(float(input()), kelvin, farenheit))
