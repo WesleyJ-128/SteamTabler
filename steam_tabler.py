@@ -192,6 +192,8 @@ pres_units = ["MPa", "kPa", "Pa", "bar", "atm"]
 def search_mode_change():
     mode = search_mode.get()
     result_type.set("")
+    result_unit_sel.set("")
+    result_unit_sel["values"] = []
     match mode:
         case SearchMode.SAT_BY_T.value:
             result_type['values'] = sorted([x.disp_name for x in Property if x.type == PropType.SAT] + [Property.PRESSURE.disp_name])
@@ -217,6 +219,27 @@ def search_mode_change():
             pres_label.configure(state=tk.NORMAL)
             pres_entry.configure(state=tk.NORMAL)
             pres_unit_sel.configure(state=tk.NORMAL)
+
+def update_units(event):
+    print("update")
+
+def run_search():
+    mode = search_mode.get()
+    match mode:
+        case SearchMode.SAT_BY_T.value:
+            print(temp_entry.get())
+            print(temp_unit_sel.get())
+            print(result_type.get())
+        case SearchMode.SAT_BY_P.value:
+            print(pres_entry.get())
+            print(pres_unit_sel.get())
+            print(result_type.get())
+        case SearchMode.T_AND_P.value:
+            print(temp_entry.get())
+            print(temp_unit_sel.get())
+            print(pres_entry.get())
+            print(pres_unit_sel.get())
+            print(result_type.get())
 
 root = tk.Tk()
 root.title("SteamTabler")
@@ -244,9 +267,16 @@ pres_unit_sel = ttk.Combobox(root, values=pres_units, state="readonly")
 pres_unit_sel.grid(row=6,column=2)
 
 tk.Label(root, text="Property to look up:").grid(row=8,column=0)
-result_type = ttk.Combobox(root,state="readonly")
-result_type.grid(row=8,column=1,columnspan=2,sticky='EW')
+result_type = ttk.Combobox(root, state="readonly")
+result_type.grid(row=8,column=1,columnspan=2,sticky="EW")
+result_type.bind("<<ComboboxSelected>>", update_units)
 search_mode_change()
+
+tk.Label(root, text="Output Units:").grid(row=9,column=0)
+result_unit_sel = ttk.Combobox(root, state="readonly")
+result_unit_sel.grid(row=9, column= 1)
+
+tk.Button(root, command=run_search, text="Go!").grid(row=11,column=0,columnspan=3,sticky="EW")
 
 
 root.mainloop()
