@@ -116,15 +116,6 @@ def search_interpolate(search_by: Property, search_by_value: float, search_for: 
         result = lin_interpolate(search_by_value, low_x, high_x, low_result, high_result)
     return low_x, high_x, result
 
-def find_value_1var(search_by: Property, search_by_value: float, search_for: Property, P_table: list[dict], T_table: list[dict]):
-    match search_by:
-        case Property.TEMP:
-            return search_interpolate(search_by, search_by_value, search_for, T_table)
-        case Property.PRESSURE:
-            return search_interpolate(search_by, search_by_value, search_for, P_table)
-        case _:
-            raise ValueError(f"Searching by {search_by.value} not supported!")
-
 def find_value_T_P(T: float, P: float, search_for: Property, T_P_table: list[dict]):
     # Check if both T and P match exactly
     for x in T_P_table:
@@ -223,23 +214,52 @@ def search_mode_change():
 def update_units(event):
     print("update")
 
+def convert_units(unit_from, unit_to, value):
+    # very annoying unit logic goes here
+    return value
+
 def run_search():
     mode = search_mode.get()
     match mode:
         case SearchMode.SAT_BY_T.value:
-            print(temp_entry.get())
-            print(temp_unit_sel.get())
-            print(result_type.get())
+            try:
+                temp_raw = float(temp_entry.get())
+            except ValueError:
+                result_string.set("ERROR: Temperature must be a number.")
+            unit_raw = temp_unit_sel.get()
+            result_type_raw = result_type.get()
+            table_var = [x for x in Property if x.disp_name == result_type_raw][0]
+            result_unit_raw = result_unit_sel.get()
+
+            table_temp = convert_units(None, None, temp_raw) # make real units
+            (temp_low, temp_high, output) = search_interpolate(
+                Property.TEMP,
+                table_temp,
+                table_var,
+                sat_by_T
+            )
+            true_out = convert_units(None, None, output)
+            disp_temp_low = convert_units(None, None, temp_low)
+            disp_temp_high = convert_units(None, None, temp_high)
+            if temp_low:
+                if temp_low == temp_high:
+                    result_string.set(f"{result_type_raw} at {temp_raw} {unit_raw} is {true_out} {result_unit_raw}.")
+                else:
+                    result_string.set(
+                        f"Interpolating between {disp_temp_low} {unit_raw} and {disp_temp_high} {unit_raw}.\n{result_type_raw} at {temp_raw} {unit_raw} is {true_out} {result_unit_raw}."
+                    )
         case SearchMode.SAT_BY_P.value:
-            print(pres_entry.get())
-            print(pres_unit_sel.get())
-            print(result_type.get())
+            pres_entry.get()
+            pres_unit_sel.get()
+            result_type.get()
+            result_unit_sel.get()
         case SearchMode.T_AND_P.value:
-            print(temp_entry.get())
-            print(temp_unit_sel.get())
-            print(pres_entry.get())
-            print(pres_unit_sel.get())
-            print(result_type.get())
+            temp_entry.get()
+            temp_unit_sel.get()
+            pres_entry.get()
+            pres_unit_sel.get()
+            result_type.get()
+            result_unit_sel.get()
 
 root = tk.Tk()
 root.title("SteamTabler")
@@ -270,13 +290,17 @@ tk.Label(root, text="Property to look up:").grid(row=8,column=0)
 result_type = ttk.Combobox(root, state="readonly")
 result_type.grid(row=8,column=1,columnspan=2,sticky="EW")
 result_type.bind("<<ComboboxSelected>>", update_units)
-search_mode_change()
 
 tk.Label(root, text="Output Units:").grid(row=9,column=0)
 result_unit_sel = ttk.Combobox(root, state="readonly")
 result_unit_sel.grid(row=9, column= 1)
 
-tk.Button(root, command=run_search, text="Go!").grid(row=11,column=0,columnspan=3,sticky="EW")
+tk.Button(root, command=run_search, text="Go!").grid(row=10,column=0,columnspan=3,sticky="EW")
 
+result_string = tk.StringVar()
+result = tk.Label(root, textvariable=result_string)
+result_string.set("No search results yet.")
+result.grid(row=11, column=0, columnspan=3)
 
+search_mode_change()
 root.mainloop()
