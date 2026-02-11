@@ -173,6 +173,10 @@ comp_sup = read_csv(comp_sup_file)
 
 CELSIUS = Units.Unit("°C", 1, Units.Type.TEMPERATURE, 273.15)
 MPA = Units.Unit("MPa", 1e6, Units.Type.PRESSURE)
+M3_PER_KG = Units.Unit("m^3/kg", 1, Units.Type.SPECIFIC_VOLUME)
+KG_PER_M3 = Units.Unit("kg/m^3", 1, Units.Type.DENSITY)
+KJ_PER_KG = Units.Unit("kJ/kg", 1000, Units.Type.SPECIFIC_ENERGY)
+KJ_PER_KG_K = Units.Unit("kJ/(kg*K)", 1000, Units.Type.SPECIFIC_ENTROPY)
 ALL_UNITS = [
     Units.Unit("K", 1, Units.Type.TEMPERATURE),
     CELSIUS,
@@ -183,10 +187,18 @@ ALL_UNITS = [
     Units.Unit("Pa", 1, Units.Type.PRESSURE),
     Units.Unit("bar", 1e5, Units.Type.PRESSURE),
     Units.Unit("atm", 101325, Units.Type.PRESSURE),
-    Units.Unit("m^3/kg", 1, Units.Type.SPECIFIC_VOLUME),
-    Units.Unit("kg/m^3", 1, Units.Type.DENSITY),
-    Units.Unit("kJ/kg", 1000, Units.Type.SPECIFIC_ENERGY),
-    Units.Unit("kJ/(kg*K)", 1000, Units.Type.SPECIFIC_ENTROPY)
+    M3_PER_KG,
+    KG_PER_M3,
+    KJ_PER_KG,
+    KJ_PER_KG_K
+]
+TABLE_UNITS = [
+    CELSIUS,
+    MPA,
+    M3_PER_KG,
+    KG_PER_M3,
+    KJ_PER_KG,
+    KJ_PER_KG_K
 ]
 temp_unit_symbols = sorted([x.symbol for x in ALL_UNITS if x.type == Units.Type.TEMPERATURE], key=lambda x: x.strip("°"))
 pres_unit_symbols = sorted([x.symbol for x in ALL_UNITS if x.type == Units.Type.PRESSURE], key=lambda x: x.lower())
@@ -253,11 +265,13 @@ def run_search():
                 result_string.set("ERROR: Select a property to look up.")
                 return
             table_var = [x for x in Property if x.disp_name == result_type_raw][0]
+            table_unit = [x for x in TABLE_UNITS if x.type == table_var.unit_type][0]
 
             result_unit_raw = result_unit_sel.get()
-            #if not result_unit_raw:
-                #result_string.set("ERROR: Select an output unit.")
-                #return
+            if not result_unit_raw:
+                result_string.set("ERROR: Select an output unit.")
+                return
+            result_unit = [x for x in ALL_UNITS if x.symbol == result_unit_raw][0]
 
             table_temp = Units.convert(temp_raw, temp_unit, CELSIUS)
             (temp_low, temp_high, output) = search_interpolate(
@@ -268,7 +282,7 @@ def run_search():
             )
 
             if temp_low:
-                true_out = Units.convert(output, nulTemp, nulTemp)
+                true_out = Units.convert(output, table_unit, result_unit)
                 disp_temp_low = Units.convert(temp_low, CELSIUS, temp_unit)
                 disp_temp_high = Units.convert(temp_high, CELSIUS, temp_unit)
                 if temp_low == temp_high:
@@ -299,11 +313,13 @@ def run_search():
                 result_string.set("ERROR: Select a property to look up.")
                 return
             table_var = [x for x in Property if x.disp_name == result_type_raw][0]
+            table_unit = [x for x in TABLE_UNITS if x.type == table_var.unit_type][0]
 
             result_unit_raw = result_unit_sel.get()
-            #if not result_unit_raw:
-                #result_string.set("ERROR: Select an output unit.")
-                #return
+            if not result_unit_raw:
+                result_string.set("ERROR: Select an output unit.")
+                return
+            result_unit = [x for x in ALL_UNITS if x.symbol == result_unit_raw][0]
 
             table_pres = Units.convert(pres_raw, pres_unit, MPA)
             (pres_low, pres_high, output) = search_interpolate(
@@ -314,7 +330,7 @@ def run_search():
             )
             
             if pres_low:
-                true_out = Units.convert(output, nulPres, nulPres)
+                true_out = Units.convert(output, table_unit, result_unit)
                 disp_pres_low = Units.convert(pres_low, MPA, pres_unit)
                 disp_pres_high = Units.convert(pres_high, MPA, pres_unit)
                 if pres_low == pres_high:
