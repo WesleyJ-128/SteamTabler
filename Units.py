@@ -9,10 +9,12 @@ class Type(Enum):
     ENTROPY = "entropy"
 
 class Unit():
-    def __init__(self, conversion, type, native_shift = 0, si_shift = 0):
+    def __init__(self, symbol: str, conversion: float, type: Type, native_shift = 0.0, si_shift = 0.0):
         """
         Creates a new Unit object
         
+        :param symbol: String to display as the unit's symbol
+        :type symbol: str
         :param conversion: Conversion factor, as SI units/self units
         :type conversion: float
         :param type: Type of unit (e.g. temperature, pressure, etc.)
@@ -22,10 +24,14 @@ class Unit():
         :param si_shift: Additive shift applied after conversion factor
         :type si_shift: float
         """
+        self.symbol = symbol
         self.conversion = conversion
         self.type = type
         self.native_shift = native_shift
         self.si_shift = si_shift
+    
+    def __repr__(self):
+        return self.symbol
 
 def convert(value: float, unit_from: Unit, unit_to: Unit) -> float:
     """
