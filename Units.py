@@ -9,5 +9,8 @@ class Type(Enum):
     ENTROPY = "entropy"
 
 class Unit():
-    def __init__(self):
-        pass
+    def __init__(self, conversion, type, native_shift = 0, si_shift = 0):
+        self.conversion = conversion
+        self.type = type
+        self.native_shift = native_shift
+        self.si_shift = si_shift
