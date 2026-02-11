@@ -171,8 +171,22 @@ sat_by_P = read_csv(sat_by_P_file)
 comp_sup = read_csv(comp_sup_file)
 
 
-temp_units = ["°C", "K", "°F", "°R"]
-pres_units = ["MPa", "kPa", "Pa", "bar", "atm"]
+temp_units = [
+    Units.Unit("K", 1, Units.Type.TEMPERATURE),
+    Units.Unit("°C", 1, Units.Type.TEMPERATURE, 273.15),
+    Units.Unit("°F", 5/9, Units.Type.TEMPERATURE, -32, 273.15),
+    Units.Unit("°R", 5/9, Units.Type.TEMPERATURE)
+]
+temp_unit_symbols = sorted([x.symbol for x in temp_units], key=lambda x: x.strip("°"))
+
+pres_units = [
+    Units.Unit("MPa", 1e6, Units.Type.PRESSURE),
+    Units.Unit("kPa", 1e3, Units.Type.PRESSURE),
+    Units.Unit("Pa", 1, Units.Type.PRESSURE),
+    Units.Unit("bar", 1e5, Units.Type.PRESSURE),
+    Units.Unit("atm", 101325, Units.Type.PRESSURE)
+]
+pres_unit_symbols = sorted([x.symbol for x in pres_units], key=lambda x: x.lower())
 
 def search_mode_change():
     mode = search_mode.get()
@@ -209,8 +223,8 @@ def update_units(event):
     print("update")
 
 def run_search():
-    nulTemp = Units.Unit(1, Units.Type.TEMPERATURE)
-    nulPres = Units.Unit(1, Units.Type.PRESSURE)
+    nulTemp = Units.Unit("null", 1, Units.Type.TEMPERATURE)
+    nulPres = Units.Unit("null", 1, Units.Type.PRESSURE)
     mode = search_mode.get()
     match mode:
         case SearchMode.SAT_BY_T.value:
@@ -326,14 +340,14 @@ temp_label = tk.Label(root, text="Temperature:")
 temp_label.grid(row=5,column=0)
 temp_entry = tk.Entry(root)
 temp_entry.grid(row=5,column=1)
-temp_unit_sel = ttk.Combobox(root, values=temp_units, state="readonly")
+temp_unit_sel = ttk.Combobox(root, values=temp_unit_symbols, state="readonly")
 temp_unit_sel.grid(row=5,column=2)
 
 pres_label = tk.Label(root, text="Pressure:")
 pres_label.grid(row=6,column=0)
 pres_entry = tk.Entry(root)
 pres_entry.grid(row=6,column=1)
-pres_unit_sel = ttk.Combobox(root, values=pres_units, state="readonly")
+pres_unit_sel = ttk.Combobox(root, values=pres_unit_symbols, state="readonly")
 pres_unit_sel.grid(row=6,column=2)
 
 tk.Label(root, text="Property to look up:").grid(row=8,column=0)
