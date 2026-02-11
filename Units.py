@@ -7,3 +7,7 @@ class Type(Enum):
     DENSITY = "density"
     SPECIFIC_ENERGY = "sprecific_energy"
     ENTROPY = "entropy"
+
+class Unit():
+    def __init__(self):
+        pass
