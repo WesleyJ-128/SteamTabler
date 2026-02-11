@@ -85,11 +85,6 @@ def lin_interpolate(x, x_min, x_max, y_min, y_max):
         raise ArithmeticError("Divide by Zero when interpolating!")
     return y_min + ((x - x_min) * (y_max - y_min)) / (x_max - x_min)
 
-def double_interpolate(x, y, x_min, x_max, y_min, y_max, z_x_y, z_X_y, z_x_Y, z_X_Y):
-    low_y_point = lin_interpolate(x, x_min, x_max, z_x_y, z_X_y)
-    high_y_point = lin_interpolate(x, x_min, x_max, z_x_Y, z_X_Y)
-    return lin_interpolate(y, y_min, y_max, low_y_point, high_y_point)
-
 def search_interpolate(search_by: Property, search_by_value: float, search_for: Property, table: list[dict]):
     low_x = -inf
     high_x = inf
