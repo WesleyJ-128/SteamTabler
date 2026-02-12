@@ -1,0 +1,48 @@
+{
+    "table_units": [
+        {
+            "symbol": "°C",
+            "type": "temperature",
+            "conversion": 1
+        },
+        {
+            "symbol": "MPa",
+            "type": "pressure",
+            "conversion": 1e6
+        },
+        {
+            "symbol": "m^3/kg",
+            "type": "specific_volume",
+            "conversion": 1
+        },
+        {
+            "symbol": "kg/m^3",
+            "type": "density",
+            "conversion": 1
+        },
+        {
+            "symbol": "kJ/kg",
+            "type": "specific_energy",
+            "conversion": 1000
+        },
+        {
+            "symbol": "kJ/(kg*K)",
+            "type": "specific_entropy",
+            "conversion": 1000
+        }
+    ],
+    "other_units": [
+        {
+            "symbol": "°F",
+            "type": "temperature",
+            "conversion": 0.5555555555555556,
+            "native_shift": -32,
+            "si_shift": 273.15
+        },
+        {
+            "symbol": "mol/m^3",
+            "type": "density",
+            "conversion": 0.018015
+        }
+    ]
+}
