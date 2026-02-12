@@ -243,8 +243,6 @@ def update_units(event):
         result_unit_sel.set(new_units[0])
 
 def run_search():
-    nulTemp = Units.Unit("null", 1, Units.Type.TEMPERATURE)
-    nulPres = Units.Unit("null", 1, Units.Type.PRESSURE)
     mode = search_mode.get()
     match mode:
         case SearchMode.SAT_BY_T.value:
