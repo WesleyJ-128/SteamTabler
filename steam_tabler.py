@@ -241,6 +241,8 @@ def update_units(event):
     result_unit_sel["values"] = new_units
     if len(new_units) == 1:
         result_unit_sel.set(new_units[0])
+    else:
+        result_unit_sel.set("")
 
 def one_var_lookup(
         search_prop: Property,
@@ -375,5 +377,4 @@ result_string.set("No search results yet.")
 result.grid(row=11, column=0, columnspan=3)
 
 search_mode_change()
-print([x.si_shift for x in ALL_UNITS if x.symbol == "K"])
 root.mainloop()
