@@ -32,6 +32,13 @@ class Unit():
     
     def __repr__(self):
         return self.symbol
+    
+    def __eq__(self, value):
+        return (
+            (self.si_shift == value.si_shift) and
+            (self.conversion == value.conversion) and
+            (self.native_shift == value.native_shift) and
+            (self.type == value.type))
 
 def convert(value: float, unit_from: Unit, unit_to: Unit) -> float:
     """
@@ -46,6 +53,8 @@ def convert(value: float, unit_from: Unit, unit_to: Unit) -> float:
     :return: ``value``, in terms of ``unit_to``
     :rtype: float
     """
+    if unit_from == unit_to:
+        return value
     if unit_from.type != unit_to.type:
         raise ValueError("Cannot convert between units of mismatched type!")
     si_value = ((value + unit_from.native_shift) * unit_from.conversion) + unit_from.si_shift
