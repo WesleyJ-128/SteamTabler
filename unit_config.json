@@ -3,7 +3,8 @@
         {
             "symbol": "°C",
             "type": "temperature",
-            "conversion": 1
+            "conversion": 1,
+            "native_shift": 273.15
         },
         {
             "symbol": "MPa",
