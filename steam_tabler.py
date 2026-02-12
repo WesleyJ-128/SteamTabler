@@ -392,17 +392,22 @@ def run_search():
                 exact_T = low_T == high_T
                 exact_P = low_P == high_P
                 if exact_T and exact_P:
-                    result_string.set(f"{result_type_raw} at {temp_raw} {temp_unit_raw} and {pres_raw} {pres_unit_raw} is {disp_result}{result_unit_raw}.")
+                    result_string.set(f"{result_type_raw} at {temp_raw} {temp_unit_raw} "
+                                       f"and {pres_raw} {pres_unit_raw} is {disp_result}{result_unit_raw}.")
                 elif exact_T:
-                    result_string.set(f"Interpolating between {disp_low_P} {pres_unit_raw} and {disp_high_P} {pres_unit_raw}.\
-\n{result_type_raw} at {temp_raw} {temp_unit_raw} and {pres_raw} {pres_unit_raw} is {disp_result}{result_unit_raw}.")
+                    result_string.set(f"Interpolating between {disp_low_P} {pres_unit_raw} and {disp_high_P} {pres_unit_raw}."
+                                      f"\n{result_type_raw} at {temp_raw} {temp_unit_raw} and {pres_raw} {pres_unit_raw} "
+                                      f"is {disp_result}{result_unit_raw}.")
                 elif exact_P:
-                    result_string.set(f"Interpolating between {disp_low_T} {temp_unit_raw} and {disp_high_T} {temp_unit_raw}.\
-\n{result_type_raw} at {temp_raw} {temp_unit_raw} and {pres_raw} {pres_unit_raw} is {disp_result}{result_unit_raw}.")
+                    result_string.set(f"Interpolating between {disp_low_T} {temp_unit_raw} and {disp_high_T} {temp_unit_raw}."
+                                      f"\n{result_type_raw} at {temp_raw} {temp_unit_raw} and {pres_raw} {pres_unit_raw} "
+                                      f"is {disp_result}{result_unit_raw}.")
                 else:
-                    result_string.set(f"Double-interpolating in temp range {disp_low_T} {temp_unit_raw} to \
-{disp_high_T} {temp_unit_raw} and pressure range {disp_low_P} {pres_unit_raw} to {disp_high_P} {pres_unit_raw}.\
-\n{result_type_raw} at {temp_raw} {temp_unit_raw} and {pres_raw} {pres_unit_raw} is {disp_result}{result_unit_raw}.")
+                    result_string.set(f"Double-interpolating in temp range {disp_low_T} {temp_unit_raw} to "
+                                      f"{disp_high_T} {temp_unit_raw} and pressure range {disp_low_P} {pres_unit_raw} "
+                                      f"to {disp_high_P} {pres_unit_raw}.\n{result_type_raw} at "
+                                      f"{temp_raw} {temp_unit_raw} and {pres_raw} {pres_unit_raw} "
+                                      f"is {disp_result}{result_unit_raw}.")
             else:
                 result_string.set(f"ERROR: Combination of {temp_raw} {temp_unit_raw} and {pres_raw} {pres_unit_raw} outside of table range.")
 
