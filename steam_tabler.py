@@ -153,7 +153,6 @@ def find_value_T_P(T: float, P: float, search_for: Property, T_P_table: list[dic
     high_temp_entries = [x for x in T_P_table if x[Property.TEMP.value] == high_temp]
     low_temp_result = search_interpolate(Property.PRESSURE, P, search_for, low_temp_entries)
     high_temp_result = search_interpolate(Property.PRESSURE, P, search_for, high_temp_entries)
-    print(high_temp_result)
     if low_temp_result[2] is None or high_temp_result[2] is None:
         return None, None, None, None, None
     # special case to deal with phase string values
@@ -236,8 +235,11 @@ def search_mode_change():
 
 def update_units(event):
     current_result_type = result_type.get()
-    new_type = [x.unit_type for x in Property if x.disp_name == current_result_type][0]
-    new_units = sorted([x.symbol for x in ALL_UNITS if x.type == new_type], key=lambda x: x.strip("°").lower())
+    if current_result_type == Property.PHASE.disp_name:
+        new_units = ["N/A"]
+    else:
+        new_type = [x.unit_type for x in Property if x.disp_name == current_result_type][0]
+        new_units = sorted([x.symbol for x in ALL_UNITS if x.type == new_type], key=lambda x: x.strip("°").lower())
     result_unit_sel["values"] = new_units
     if len(new_units) == 1:
         result_unit_sel.set(new_units[0])
@@ -288,7 +290,7 @@ def one_var_lookup(
         table
     )
 
-    if x_low:
+    if x_low and x_high and output:
         true_out = Units.convert(output, table_unit, result_unit)
         disp_low = Units.convert(x_low, table_base_unit, inp_unit)
         disp_high = Units.convert(x_high, table_base_unit, inp_unit)
@@ -296,8 +298,8 @@ def one_var_lookup(
             result_string.set(f"{result_type_raw} at {entry_raw} {unit_raw} is {true_out} {result_unit_raw}.")
         else:
             result_string.set(
-                f"Interpolating between {disp_low} {unit_raw} and {disp_high} {unit_raw}. \
-                \n{result_type_raw} at {entry_raw} {unit_raw} is {true_out} {result_unit_raw}."
+                f"Interpolating between {disp_low} {unit_raw} and {disp_high} {unit_raw}.\
+\n{result_type_raw} at {entry_raw} {unit_raw} is {true_out} {result_unit_raw}."
             )
     else:
         result_string.set(f"ERROR: {entry_raw} {unit_raw} outside of table range.")
@@ -328,12 +330,82 @@ def run_search():
                 sat_by_T
             )       
         case SearchMode.T_AND_P.value:
-            temp_entry.get()
-            temp_unit_sel.get()
-            pres_entry.get()
-            pres_unit_sel.get()
-            result_type.get()
-            result_unit_sel.get()
+            try:
+                temp_raw = float(temp_entry.get())
+            except ValueError:
+                result_string.set(f"ERROR: Temperature must be a number.")
+                return
+
+            temp_unit_raw = temp_unit_sel.get()
+            if not temp_unit_raw:
+                result_string.set(f"ERROR: Select a temperature unit.")
+                return
+            temp_unit = [x for x in ALL_UNITS if x.symbol == temp_unit_raw][0]
+            
+            table_temp = Units.convert(temp_raw, temp_unit, CELSIUS)
+
+            try:
+                pres_raw = float(pres_entry.get())
+            except ValueError:
+                result_string.set(f"ERROR: Pressure must be a number.")
+                return
+
+            pres_unit_raw = pres_unit_sel.get()
+            if not pres_unit_raw:
+                result_string.set(f"ERROR: Select a pressure unit.")
+                return
+            pres_unit = [x for x in ALL_UNITS if x.symbol == pres_unit_raw][0]
+
+            table_pres = Units.convert(pres_raw, pres_unit, MPA)
+            
+            result_type_raw = result_type.get()
+            if not result_type_raw:
+                result_string.set("ERROR: Select a property to look up.")
+                return
+            table_var = [x for x in Property if x.disp_name == result_type_raw][0]
+            if table_var == Property.PHASE:
+                table_unit = None
+            else:
+                table_unit = [x for x in TABLE_UNITS if x.type == table_var.unit_type][0]
+
+            result_unit_raw = result_unit_sel.get()
+            if not result_unit_raw:
+                result_string.set("ERROR: Select an output unit.")
+                return
+            if table_var == Property.PHASE:
+                result_unit_raw = ""
+                result_unit = None
+            else:
+                result_unit = [x for x in ALL_UNITS if x.symbol == result_unit_raw][0]
+                result_unit_raw = " " + result_unit_raw
+
+            (low_T, high_T, low_P, high_P, table_result) = find_value_T_P(table_temp, table_pres, table_var, comp_sup)
+            if low_T and high_T and low_P and high_P and table_result:
+                disp_low_T = Units.convert(low_T, CELSIUS, temp_unit)
+                disp_high_T = Units.convert(high_T, CELSIUS, temp_unit)
+                disp_low_P = Units.convert(low_P, MPA, pres_unit)
+                disp_high_P = Units.convert(high_P, MPA, pres_unit)
+                if table_var == Property.PHASE:
+                    disp_result = table_result
+                else:
+                    disp_result = Units.convert(table_result, table_unit, result_unit)
+                exact_T = low_T == high_T
+                exact_P = low_P == high_P
+                if exact_T and exact_P:
+                    result_string.set(f"{result_type_raw} at {temp_raw} {temp_unit_raw} and {pres_raw} {pres_unit_raw} is {disp_result}{result_unit_raw}.")
+                elif exact_T:
+                    result_string.set(f"Interpolating between {disp_low_P} {pres_unit_raw} and {disp_high_P} {pres_unit_raw}.\
+\n{result_type_raw} at {temp_raw} {temp_unit_raw} and {pres_raw} {pres_unit_raw} is {disp_result}{result_unit_raw}.")
+                elif exact_P:
+                    result_string.set(f"Interpolating between {disp_low_T} {temp_unit_raw} and {disp_high_T} {temp_unit_raw}.\
+\n{result_type_raw} at {temp_raw} {temp_unit_raw} and {pres_raw} {pres_unit_raw} is {disp_result}{result_unit_raw}.")
+                else:
+                    result_string.set(f"Double-interpolating in temp range {disp_low_T} {temp_unit_raw} to \
+{disp_high_T} {temp_unit_raw} and pressure range {disp_low_P} {pres_unit_raw} to {disp_high_P} {pres_unit_raw}.\
+\n{result_type_raw} at {temp_raw} {temp_unit_raw} and {pres_raw} {pres_unit_raw} is {disp_result}{result_unit_raw}.")
+            else:
+                result_string.set(f"ERROR: Combination of {temp_raw} {temp_unit_raw} and {pres_raw} {pres_unit_raw} outside of table range.")
+
 
 root = tk.Tk()
 root.title("SteamTabler")
