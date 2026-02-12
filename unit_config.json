@@ -41,6 +41,47 @@
             "si_shift": 273.15
         },
         {
+            "symbol": "K",
+            "type": "temperature",
+            "conversion": 1
+        },
+        {
+            "symbol": "°R",
+            "type": "temperature",
+            "conversion": 0.5555555555555556
+        },
+        {
+            "symbol": "atm",
+            "type": "pressure",
+            "conversion": 101325
+        },
+        {
+            "symbol": "Pa",
+            "type": "pressure",
+            "conversion": 1
+        },
+        {
+            "symbol": "kPa",
+            "type": "pressure",
+            "conversion": 1000
+        },
+        {
+            "symbol": "psia",
+            "type": "pressure",
+            "conversion": 6894.744825494
+        },
+        {
+            "symbol": "psig",
+            "type": "pressure",
+            "conversion": 6894.744825494,
+            "si_shift": 101325
+        },
+        {
+            "symbol": "bar",
+            "type": "pressure",
+            "conversion": 1e5
+        },
+        {
             "symbol": "mol/m^3",
             "type": "density",
             "conversion": 0.018015
