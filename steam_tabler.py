@@ -298,8 +298,8 @@ def one_var_lookup(
             result_string.set(f"{result_type_raw} at {entry_raw} {unit_raw} is {true_out} {result_unit_raw}.")
         else:
             result_string.set(
-                f"Interpolating between {disp_low} {unit_raw} and {disp_high} {unit_raw}.\
-\n{result_type_raw} at {entry_raw} {unit_raw} is {true_out} {result_unit_raw}."
+                f"Interpolating between {disp_low} {unit_raw} and {disp_high} {unit_raw}."
+                f"\n{result_type_raw} at {entry_raw} {unit_raw} is {true_out} {result_unit_raw}."
             )
     else:
         result_string.set(f"ERROR: {entry_raw} {unit_raw} outside of table range.")
