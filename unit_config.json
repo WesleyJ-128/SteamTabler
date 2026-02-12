@@ -82,9 +82,24 @@
             "conversion": 1e5
         },
         {
+            "symbol": "m^3/mol",
+            "type": "specific_volume",
+            "conversion": 55.5092978
+        },
+        {
             "symbol": "mol/m^3",
             "type": "density",
             "conversion": 0.018015
+        },
+        {
+            "symbol": "kJ/mol",
+            "type": "specific_energy",
+            "conversion": 55509.2978
+        },
+        {
+            "symbol": "kJ/(mol*K)",
+            "type": "specific_entropy",
+            "conversion": 55509.2978
         }
     ]
 }
