@@ -5,6 +5,7 @@ from math import inf
 import tkinter as tk
 from tkinter import ttk
 import Units
+import json
 
 # this doesn't work if the working directory has been changed
 # so it's at the beginning just in case
@@ -13,6 +14,7 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 sat_by_P_file = os.path.join(dir_path, "saturated_by_pressure_V1.4.csv")
 sat_by_T_file = os.path.join(dir_path, "saturated_by_temperature_V1.5.csv")
 comp_sup_file = os.path.join(dir_path, "compressed_liquid_and_superheated_steam_V1.3.csv")
+unit_config_file = os.path.join(dir_path, "unit_config.json")
 
 class PropType(Enum):
     SAT = "sat"
@@ -169,36 +171,72 @@ sat_by_T = read_csv(sat_by_T_file)
 sat_by_P = read_csv(sat_by_P_file)
 comp_sup = read_csv(comp_sup_file)
 
+def assemble_unit(unit_json: dict) -> Units.Unit:
+    if "native_shift" in unit_json.keys():
+        native_shift = unit_json["native_shift"]
+    else:
+        native_shift = 0
+    if "si_shift" in unit_json.keys():
+        si_shift = unit_json["si_shift"]
+    else:
+        si_shift = 0
+    unit_type = [x for x in Units.Type if x.value == unit_json["type"]][0]
+    return Units.Unit(unit_json["symbol"], unit_json["conversion"], unit_type, native_shift, si_shift)
 
-CELSIUS = Units.Unit("°C", 1, Units.Type.TEMPERATURE, 273.15)
-MPA = Units.Unit("MPa", 1e6, Units.Type.PRESSURE)
-M3_PER_KG = Units.Unit("m^3/kg", 1, Units.Type.SPECIFIC_VOLUME)
-KG_PER_M3 = Units.Unit("kg/m^3", 1, Units.Type.DENSITY)
-KJ_PER_KG = Units.Unit("kJ/kg", 1000, Units.Type.SPECIFIC_ENERGY)
-KJ_PER_KG_K = Units.Unit("kJ/(kg*K)", 1000, Units.Type.SPECIFIC_ENTROPY)
-ALL_UNITS = [
-    Units.Unit("K", 1, Units.Type.TEMPERATURE),
-    CELSIUS,
-    Units.Unit("°F", 5/9, Units.Type.TEMPERATURE, -32, 273.15),
-    Units.Unit("°R", 5/9, Units.Type.TEMPERATURE),
-    MPA,
-    Units.Unit("kPa", 1e3, Units.Type.PRESSURE),
-    Units.Unit("Pa", 1, Units.Type.PRESSURE),
-    Units.Unit("bar", 1e5, Units.Type.PRESSURE),
-    Units.Unit("atm", 101325, Units.Type.PRESSURE),
-    M3_PER_KG,
-    KG_PER_M3,
-    KJ_PER_KG,
-    KJ_PER_KG_K
-]
-TABLE_UNITS = [
-    CELSIUS,
-    MPA,
-    M3_PER_KG,
-    KG_PER_M3,
-    KJ_PER_KG,
-    KJ_PER_KG_K
-]
+with open(unit_config_file, encoding="utf-8-sig") as f:
+    units_data = json.loads(f.read())
+
+CELSIUS = None
+MPA = None
+TABLE_UNITS = []
+if "table_units" in units_data.keys() :
+    for unit_data in units_data["table_units"]:
+        unit = assemble_unit(unit_data)
+        TABLE_UNITS.append(unit)
+        if unit.symbol == "°C":
+            CELSIUS = unit
+        elif unit.symbol == "MPa":
+            MPA = unit
+else:
+    raise RuntimeError("Table units must be provided in unit_config.json!")
+if CELSIUS is None or MPA is None:
+    raise RuntimeError("Table unit config must include Celsius and MPa!")
+
+ALL_UNITS = TABLE_UNITS
+if "other_units" in units_data.keys():
+    for unit_data in units_data["other_units"]:
+        unit = assemble_unit(unit_data)
+        ALL_UNITS.append(unit)
+        
+#CELSIUS = Units.Unit("°C", 1, Units.Type.TEMPERATURE, 273.15)
+#MPA = Units.Unit("MPa", 1e6, Units.Type.PRESSURE)
+#M3_PER_KG = Units.Unit("m^3/kg", 1, Units.Type.SPECIFIC_VOLUME)
+#KG_PER_M3 = Units.Unit("kg/m^3", 1, Units.Type.DENSITY)
+#KJ_PER_KG = Units.Unit("kJ/kg", 1000, Units.Type.SPECIFIC_ENERGY)
+#KJ_PER_KG_K = Units.Unit("kJ/(kg*K)", 1000, Units.Type.SPECIFIC_ENTROPY)
+#ALL_UNITS = [
+#    Units.Unit("K", 1, Units.Type.TEMPERATURE),
+#    CELSIUS,
+#    Units.Unit("°F", 5/9, Units.Type.TEMPERATURE, -32, 273.15),
+#    Units.Unit("°R", 5/9, Units.Type.TEMPERATURE),
+#    MPA,
+#    Units.Unit("kPa", 1e3, Units.Type.PRESSURE),
+#    Units.Unit("Pa", 1, Units.Type.PRESSURE),
+#    Units.Unit("bar", 1e5, Units.Type.PRESSURE),
+#    Units.Unit("atm", 101325, Units.Type.PRESSURE),
+#    M3_PER_KG,
+#    KG_PER_M3,
+#    KJ_PER_KG,
+#    KJ_PER_KG_K
+#]
+#TABLE_UNITS = [
+#    CELSIUS,
+#    MPA,
+#    M3_PER_KG,
+#    KG_PER_M3,
+#    KJ_PER_KG,
+#    KJ_PER_KG_K
+#]
 temp_unit_symbols = sorted([x.symbol for x in ALL_UNITS if x.type == Units.Type.TEMPERATURE], key=lambda x: x.strip("°"))
 pres_unit_symbols = sorted([x.symbol for x in ALL_UNITS if x.type == Units.Type.PRESSURE], key=lambda x: x.lower())
 

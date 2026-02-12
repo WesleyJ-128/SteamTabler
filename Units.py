@@ -5,8 +5,8 @@ class Type(Enum):
     PRESSURE = "pressure"
     SPECIFIC_VOLUME = "specific_volume"
     DENSITY = "density"
-    SPECIFIC_ENERGY = "sprecific_energy"
-    SPECIFIC_ENTROPY = "entropy"
+    SPECIFIC_ENERGY = "specific_energy"
+    SPECIFIC_ENTROPY = "specific_entropy"
 
 class Unit():
     def __init__(self, symbol: str, conversion: float, type: Type, native_shift = 0.0, si_shift = 0.0):
