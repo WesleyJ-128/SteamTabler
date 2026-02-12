@@ -242,105 +242,89 @@ def update_units(event):
     if len(new_units) == 1:
         result_unit_sel.set(new_units[0])
 
+def one_var_lookup(
+        search_prop: Property,
+        entry_var: tk.Entry,
+        result_string: tk.StringVar,
+        inp_unit_sel: ttk.Combobox,
+        result_type: ttk.Combobox,
+        result_unit_sel: ttk.Combobox,
+        table_base_unit: Units.Unit,
+        table: list[dict],
+        ) -> None:
+    
+    try:
+        entry_raw = float(entry_var.get())
+    except ValueError:
+        result_string.set(f"ERROR: {search_prop.disp_name} must be a number.")
+        return
+    
+    unit_raw = inp_unit_sel.get()
+    if not unit_raw:
+        result_string.set(f"ERROR: Select a {search_prop.disp_name.lower()} unit.")
+        return
+    inp_unit = [x for x in ALL_UNITS if x.symbol == unit_raw][0]
+
+    result_type_raw = result_type.get()
+    if not result_type_raw:
+        result_string.set("ERROR: Select a property to look up.")
+        return
+    table_var = [x for x in Property if x.disp_name == result_type_raw][0]
+    table_unit = [x for x in TABLE_UNITS if x.type == table_var.unit_type][0]
+
+    result_unit_raw = result_unit_sel.get()
+    if not result_unit_raw:
+        result_string.set("ERROR: Select an output unit.")
+        return
+    result_unit = [x for x in ALL_UNITS if x.symbol == result_unit_raw][0]
+
+    table_inp = Units.convert(entry_raw, inp_unit, table_base_unit)
+    (x_low, x_high, output) = search_interpolate(
+        search_prop,
+        table_inp,
+        table_var,
+        table
+    )
+
+    if x_low:
+        true_out = Units.convert(output, table_unit, result_unit)
+        disp_low = Units.convert(x_low, table_base_unit, inp_unit)
+        disp_high = Units.convert(x_high, table_base_unit, inp_unit)
+        if x_low == x_high:
+            result_string.set(f"{result_type_raw} at {entry_raw} {unit_raw} is {true_out} {result_unit_raw}.")
+        else:
+            result_string.set(
+                f"Interpolating between {disp_low} {unit_raw} and {disp_high} {unit_raw}. \
+                \n{result_type_raw} at {entry_raw} {unit_raw} is {true_out} {result_unit_raw}."
+            )
+    else:
+        result_string.set(f"ERROR: {entry_raw} {unit_raw} outside of table range.")
+
 def run_search():
     mode = search_mode.get()
     match mode:
         case SearchMode.SAT_BY_T.value:
-            try:
-                temp_raw = float(temp_entry.get())
-            except ValueError:
-                result_string.set("ERROR: Temperature must be a number.")
-                return
-            
-            unit_raw = temp_unit_sel.get()
-            if not unit_raw:
-                result_string.set("ERROR: Select a temperature unit.")
-                return
-            temp_unit = [x for x in ALL_UNITS if x.symbol == unit_raw][0]
-
-            result_type_raw = result_type.get()
-            if not result_type_raw:
-                result_string.set("ERROR: Select a property to look up.")
-                return
-            table_var = [x for x in Property if x.disp_name == result_type_raw][0]
-            table_unit = [x for x in TABLE_UNITS if x.type == table_var.unit_type][0]
-
-            result_unit_raw = result_unit_sel.get()
-            if not result_unit_raw:
-                result_string.set("ERROR: Select an output unit.")
-                return
-            result_unit = [x for x in ALL_UNITS if x.symbol == result_unit_raw][0]
-
-            table_temp = Units.convert(temp_raw, temp_unit, CELSIUS)
-            (temp_low, temp_high, output) = search_interpolate(
+            one_var_lookup(
                 Property.TEMP,
-                table_temp,
-                table_var,
+                temp_entry,
+                result_string,
+                temp_unit_sel,
+                result_type,
+                result_unit_sel,
+                CELSIUS,
                 sat_by_T
             )
-
-            if temp_low:
-                true_out = Units.convert(output, table_unit, result_unit)
-                disp_temp_low = Units.convert(temp_low, CELSIUS, temp_unit)
-                disp_temp_high = Units.convert(temp_high, CELSIUS, temp_unit)
-                if temp_low == temp_high:
-                    result_string.set(f"{result_type_raw} at {temp_raw} {unit_raw} is {true_out} {result_unit_raw}.")
-                else:
-                    result_string.set(
-                        f"Interpolating between {disp_temp_low} {unit_raw} and {disp_temp_high} {unit_raw}. \
-                        \n{result_type_raw} at {temp_raw} {unit_raw} is {true_out} {result_unit_raw}."
-                    )
-            else:
-                result_string.set(f"ERROR: {temp_raw} {unit_raw} outside of table range.")
-
         case SearchMode.SAT_BY_P.value:
-            try:
-                pres_raw = float(pres_entry.get())
-            except ValueError:
-                result_string.set("ERROR: Pressure must be a number.")
-                return
-            
-            unit_raw = pres_unit_sel.get()
-            if not unit_raw:
-                result_string.set("ERROR: Select a pressure unit.")
-                return
-            pres_unit = [x for x in ALL_UNITS if x.symbol == unit_raw][0]
-            
-            result_type_raw = result_type.get()
-            if not result_type_raw:
-                result_string.set("ERROR: Select a property to look up.")
-                return
-            table_var = [x for x in Property if x.disp_name == result_type_raw][0]
-            table_unit = [x for x in TABLE_UNITS if x.type == table_var.unit_type][0]
-
-            result_unit_raw = result_unit_sel.get()
-            if not result_unit_raw:
-                result_string.set("ERROR: Select an output unit.")
-                return
-            result_unit = [x for x in ALL_UNITS if x.symbol == result_unit_raw][0]
-
-            table_pres = Units.convert(pres_raw, pres_unit, MPA)
-            (pres_low, pres_high, output) = search_interpolate(
+            one_var_lookup(
                 Property.PRESSURE,
-                table_pres,
-                table_var,
-                sat_by_P
-            )
-            
-            if pres_low:
-                true_out = Units.convert(output, table_unit, result_unit)
-                disp_pres_low = Units.convert(pres_low, MPA, pres_unit)
-                disp_pres_high = Units.convert(pres_high, MPA, pres_unit)
-                if pres_low == pres_high:
-                    result_string.set(f"{result_type_raw} at {pres_raw} {unit_raw} is {true_out} {result_unit_raw}.")
-                else:
-                    result_string.set(
-                        f"Interpolating between {disp_pres_low} {unit_raw} and {disp_pres_high} {unit_raw}. \
-                        \n{result_type_raw} at {pres_raw} {unit_raw} is {true_out} {result_unit_raw}."
-                    )
-            else:
-                result_string.set(f"ERROR: {pres_raw} {unit_raw} outside of table range.")
-                
+                pres_entry,
+                result_string,
+                pres_unit_sel,
+                result_type,
+                result_unit_sel,
+                MPA,
+                sat_by_T
+            )       
         case SearchMode.T_AND_P.value:
             temp_entry.get()
             temp_unit_sel.get()
